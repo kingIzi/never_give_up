@@ -68,7 +68,7 @@ Item{
                 TableView{
                     id: _dashboardTableView
                     Layout.fillWidth: true
-                    Layout.preferredHeight: _adminTableModel.rowCount() * 50//height o
+                    Layout.preferredHeight: _adminTableModel.rowCount() * 50//height
                     Layout.maximumHeight: 500
                     columnSpacing: 1
                     rowSpacing: 1

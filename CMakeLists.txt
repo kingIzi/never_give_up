@@ -55,6 +55,7 @@ set(QML_FILES
     forms/qml/pages/LoginPage.qml
     forms/qml/pages/MainNavigation.qml
     forms/qml/pages/DashboardPage.qml
+    forms/qml/pages/ComicPage.qml
 
     forms/qml/pages/forms/LoginForm.qml
     forms/qml/pages/forms/RegisterForm.qml
