@@ -60,6 +60,7 @@ set(QML_FILES
 
     forms/qml/components/layouts/NavBar.qml
     forms/qml/components/layouts/GeneralReview.qml
+    forms/qml/components/layouts/DashboardMostPopularAuthor.qml
 
     ${QML_FONTS}
     ${QML_SCRIPTS}
