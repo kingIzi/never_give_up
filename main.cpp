@@ -4,6 +4,8 @@
 #include <QLocale>
 #include <QTranslator>
 
+#include "admintablemodel.hpp"
+
 int main(int argc, char *argv[])
 {
     QApplication app(argc, argv);
@@ -26,6 +28,7 @@ int main(int argc, char *argv[])
             QCoreApplication::exit(-1);
     }, Qt::QueuedConnection);
 
+    qmlRegisterType<AdminTableModel>("AdminTableModel",1,0,"AdminTableModel");
     qmlRegisterSingletonType(QUrl("qrc:/never_give_up/forms/qml/Constants.qml"), "Constants", 1, 0, "Constants");
     engine.load(url);
 

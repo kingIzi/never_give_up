@@ -113,6 +113,7 @@ QtObject {
         readonly property url admin: "qrc:/never_give_up/forms/images/admins.png"
         readonly property url detailsFrame: "qrc:/never_give_up/forms/images/details-frame.png"
         readonly property url maloryBlackman: "qrc:/never_give_up/forms/images/malory-blackman.png"
+        readonly property url searchBar: "qrc:/never_give_up/forms/images/search-bar.png"
     }
 
     readonly property QtObject icons: QtObject{

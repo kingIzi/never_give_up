@@ -3,6 +3,7 @@ import QtQuick.Layouts
 import QtQuick.Controls.Material
 import Constants 1.0
 import Qt5Compat.GraphicalEffects
+import AdminTableModel 1.0
 import "../components/layouts"
 import "../../scripts/utilities.js" as Utils
 
@@ -18,7 +19,9 @@ ScrollView{
         ColumnLayout {
             id: _dashboardCol
             anchors.fill: parent
+            spacing: 20
             Item{
+                id: _detailsItem
                 Layout.fillWidth: true
                 Layout.preferredHeight: _dashboardDetailsGrid.implicitHeight
                 GridLayout{
@@ -34,6 +37,26 @@ ScrollView{
                         id: _dashBoardMostPopularAuthor
                         Layout.fillWidth: true
                         Layout.preferredHeight: 200
+                    }
+                }
+            }
+            Item{
+                id: _dataItem
+                Layout.fillWidth: true
+                Layout.preferredHeight: _dashboardDataGrid.implicitHeight
+                GridLayout{
+                    id: _dashboardDataGrid
+                    anchors.fill: parent
+                    columns: _root.width < 640 ? 1 : 2
+                    DefaultTableView{
+                        id: _defaultTableView
+                        Layout.fillWidth: true
+                        Layout.preferredHeight: implicitHeight
+                    }
+                    DashboardCharts{
+                        id: _dashboardChart
+                        Layout.fillWidth: true
+                        Layout.preferredHeight: implicitHeight
                     }
                 }
             }

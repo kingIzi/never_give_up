@@ -7,8 +7,6 @@ import "../../../scripts/utilities.js" as Utils
 
 Item{
     id: _generalReview
-//    Layout.fillWidth: true
-//    Layout.preferredHeight: 200
     Image {
         id: _detailsFrameImg
         source: Constants.images.detailsFrame

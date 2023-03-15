@@ -9,6 +9,10 @@ find_package(Qt6 6.2 COMPONENTS Quick Charts REQUIRED)
 
 qt_add_executable(appnever_give_up
     main.cpp
+
+    src/include/models/admintablemodel.hpp
+
+    src/src/models/admintablemodel.cpp
 )
 
 set(QML_FONTS
@@ -31,9 +35,12 @@ set(QML_IMAGES
     forms/images/dashboard.png
     forms/images/details-frame.png
     forms/images/malory-blackman.png
+    forms/images/search-bar.png
 
     ${BOOTSTRAP_ICONS}
 )
+
+include_directories(src/include/models)
 
 set(QML_SCRIPTS
     forms/scripts/utilities.js
@@ -61,6 +68,8 @@ set(QML_FILES
     forms/qml/components/layouts/NavBar.qml
     forms/qml/components/layouts/GeneralReview.qml
     forms/qml/components/layouts/DashboardMostPopularAuthor.qml
+    forms/qml/components/layouts/DefaultTableView.qml
+    forms/qml/components/layouts/DashboardCharts.qml
 
     ${QML_FONTS}
     ${QML_SCRIPTS}

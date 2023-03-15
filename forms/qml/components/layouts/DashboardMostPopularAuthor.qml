@@ -5,8 +5,6 @@ import Constants 1.0
 
 Rectangle{
     id: _authorReview
-//    Layout.fillWidth: true
-//    Layout.preferredHeight: 200
     color: "#1B1B1B"
     RowLayout{
         id: _authorReviewRow
