@@ -10,7 +10,6 @@ Button{
     Material.background: "transparent"
     Material.foreground: Constants.colors.link
     padding: 4
-
     font.underline: _hover.hovered ? true : false
     font.family: Constants.blackFont.h5.family
     font.pixelSize: Constants.blackFont.h5.pixelSize

@@ -27,6 +27,8 @@ Item{
             padding: 4
             font: Constants.lightFont.h4
             placeholderText: "Enter placeholder"
+            placeholderTextColor: Constants.colors.gray
+            selectedTextColor: Constants.colors.link
             Material.accent: Constants.colors.white
             color: Constants.colors.white
             maximumLength: 255

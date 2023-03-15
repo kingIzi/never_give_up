@@ -17,6 +17,7 @@ Page{
         id: _sessionStack
         anchors.centerIn: parent
         implicitHeight: currentItem.implicitHeight
+        height: parent.height / 2
         width: _root.width < 640 ? parent.width : parent.width / 2
         initialItem: LoginForm{}
     }

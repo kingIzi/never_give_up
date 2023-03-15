@@ -6,12 +6,14 @@ import "../../components/customs"
 
 ColumnLayout{
     id: _loginForm
-    anchors.margins: 10
-    anchors.fill: parent
     spacing: 10
     Component{
         id: _registerForm
         RegisterForm{}
+    }
+    Component{
+        id: _resetPasswordForm
+        ResetPasswordForm{}
     }
     Label{
         id: _loginLabel
@@ -45,20 +47,21 @@ ColumnLayout{
                 font: Constants.blackFont.h5
                 Layout.alignment: Qt.AlignLeft | Qt.AlignVCenter
                 text: "Rappele toi"
-                Material.accent: Constants.colors.white
+                Material.accent: Constants.colors.primary
                 padding: 4
                 Material.foreground: Constants.colors.white
             }
             LinkButton{
                 Component.onCompleted: font.capitalization = Font.Capitalize
                 text: "Mot de passe oublier?"
+                onClicked: _sessionStack.push(_resetPasswordForm)
             }
         }
     }
     CustomBtn{
         text: "Connecter vous"
         Layout.alignment: Qt.AlignHCenter
-        onButtonClicked: console.log("Button Clicked")
+        onButtonClicked: _appLoader.state ="navigate";
     }
     Flow{
         Layout.alignment: Qt.AlignHCenter

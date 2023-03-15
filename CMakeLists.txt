@@ -5,7 +5,7 @@ project(never_give_up VERSION 0.1 LANGUAGES CXX)
 set(CMAKE_AUTOMOC ON)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
-find_package(Qt6 6.2 COMPONENTS Quick REQUIRED)
+find_package(Qt6 6.2 COMPONENTS Quick Charts REQUIRED)
 
 qt_add_executable(appnever_give_up
     main.cpp
@@ -16,8 +16,27 @@ set(QML_FONTS
     forms/fonts/static/Montserrat-Light.ttf
 )
 
+set(BOOTSTRAP_ICONS
+    forms/icons/person-lock.svg
+    forms/icons/list.svg
+    forms/icons/arrow-up.svg
+    forms/icons/arrow-down.svg
+)
+
 set(QML_IMAGES
     forms/images/login-bg.png
+    forms/images/comics-man.png
+    forms/images/hut.png
+    forms/images/admins.png
+    forms/images/dashboard.png
+    forms/images/details-frame.png
+    forms/images/malory-blackman.png
+
+    ${BOOTSTRAP_ICONS}
+)
+
+set(QML_SCRIPTS
+    forms/scripts/utilities.js
 )
 
 set(QML_FILES
@@ -27,15 +46,23 @@ set(QML_FILES
 
     #pages
     forms/qml/pages/LoginPage.qml
+    forms/qml/pages/MainNavigation.qml
+    forms/qml/pages/DashboardPage.qml
+
     forms/qml/pages/forms/LoginForm.qml
     forms/qml/pages/forms/RegisterForm.qml
+    forms/qml/pages/forms/ResetPasswordForm.qml
 
     #components
     forms/qml/components/customs/CustomTextField.qml
     forms/qml/components/customs/LinkButton.qml
     forms/qml/components/customs/CustomBtn.qml
 
+    forms/qml/components/layouts/NavBar.qml
+    forms/qml/components/layouts/GeneralReview.qml
+
     ${QML_FONTS}
+    ${QML_SCRIPTS}
 )
 
 qt_add_qml_module(appnever_give_up
@@ -54,7 +81,7 @@ set_target_properties(appnever_give_up PROPERTIES
 )
 
 target_link_libraries(appnever_give_up
-    PRIVATE Qt6::Quick)
+    PRIVATE Qt6::Quick Qt6::Charts)
 
 install(TARGETS appnever_give_up
     BUNDLE DESTINATION .

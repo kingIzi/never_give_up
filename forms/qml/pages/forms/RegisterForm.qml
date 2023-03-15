@@ -6,8 +6,6 @@ import "../../components/customs"
 
 ColumnLayout{
             id: _registerForm
-            anchors.margins: 10
-            anchors.fill: parent
             spacing: 10
             Label{
                 id: _registerLabel

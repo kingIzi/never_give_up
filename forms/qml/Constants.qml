@@ -21,6 +21,10 @@ QtObject {
         readonly property color danger: "#df4759"
         readonly property color link: "#5bc0de"
         readonly property color primary: "#15242D"
+        readonly property color gray: "#A4A4A4"
+        readonly property color black: "#141414"
+        readonly property color success: "#399E29"
+        readonly property color sunset: "#D5AC2A"
     }
 
     readonly property QtObject blackFont: QtObject{
@@ -103,5 +107,17 @@ QtObject {
 
     readonly property QtObject images: QtObject{
         readonly property url loginBg: "qrc:/never_give_up/forms/images/login-bg.png"
+        readonly property url dashboard: "qrc:/never_give_up/forms/images/dashboard.png"
+        readonly property url comicMan: "qrc:/never_give_up/forms/images/comics-man.png"
+        readonly property url hut: "qrc:/never_give_up/forms/images/hut.png"
+        readonly property url admin: "qrc:/never_give_up/forms/images/admins.png"
+        readonly property url detailsFrame: "qrc:/never_give_up/forms/images/details-frame.png"
+        readonly property url maloryBlackman: "qrc:/never_give_up/forms/images/malory-blackman.png"
+    }
+
+    readonly property QtObject icons: QtObject{
+        readonly property url list: "qrc:/never_give_up/forms/icons/list.svg"
+        readonly property url arrowUp: "qrc:/never_give_up/forms/icons/arrow-up.svg"
+        readonly property url arrowDown: "qrc:/never_give_up/forms/icons/arrow-down.svg"
     }
 }
