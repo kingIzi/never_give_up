@@ -45,7 +45,12 @@ QHash<int, QByteArray> AdminTableModel::roleNames() const
 {
     return { {Qt::DisplayRole, "display"} };
 //    return { {FIRST_NAME, "firstName"}, {LAST_NAME, "lastname"},{TELEPHONE, "telephone"},
-//    {ADDRESS, "address"}, {DATE_OF_BIRTH, "dateOBirth"}};
+    //    {ADDRESS, "address"}, {DATE_OF_BIRTH, "dateOBirth"}};
+}
+
+const int AdminTableModel::rowSize() const
+{
+    return 5;
 }
 
 //AdminTableData *AdminTableModel::adminTableData() const

@@ -22,6 +22,8 @@ public:
 
     QHash<int, QByteArray> roleNames() const override;
 
+    Q_INVOKABLE const int rowSize() const;
+
     //AdminTableData* adminTableData() const;
 
     enum {

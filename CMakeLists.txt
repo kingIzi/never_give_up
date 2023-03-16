@@ -25,6 +25,9 @@ set(BOOTSTRAP_ICONS
     forms/icons/list.svg
     forms/icons/arrow-up.svg
     forms/icons/arrow-down.svg
+    forms/icons/plus.svg
+    forms/icons/pen.svg
+    forms/icons/dash.svg
 )
 
 set(QML_IMAGES
