@@ -120,5 +120,8 @@ QtObject {
         readonly property url list: "qrc:/never_give_up/forms/icons/list.svg"
         readonly property url arrowUp: "qrc:/never_give_up/forms/icons/arrow-up.svg"
         readonly property url arrowDown: "qrc:/never_give_up/forms/icons/arrow-down.svg"
+        readonly property url plus: "qrc:/never_give_up/forms/icons/plus.svg"
+        readonly property url pen: "qrc:/never_give_up/forms/icons/pen.svg"
+        readonly property url dash: "qrc:/never_give_up/forms/icons/dash.svg"
     }
 }

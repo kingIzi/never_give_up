@@ -26,7 +26,7 @@ ApplicationWindow {
         visible: true
         active: visible
         sourceComponent: _loginPage
-        state: "session"
+        state: "navigate"
         states: [
             State {
                 name: "session"

@@ -46,6 +46,7 @@ Item{
         Item{
             Layout.fillWidth: true
             Layout.preferredHeight: _col6L.implicitHeight
+            clip: true
             ColumnLayout{
                 id: _col6L
                 anchors.fill: parent
@@ -55,7 +56,7 @@ Item{
                     Layout.fillWidth: true
                     delegate: ItemDelegate{
                         id: _tableHeader
-                        font: Constants.blackFont.h6
+                        font: Constants.blackFont.h5
                         Material.foreground: Constants.colors.white
                         text: modelData
                         Binding{
@@ -82,8 +83,11 @@ Item{
                         id: _tableDelegateItem
                         font: Constants.blackFont.h6
                         text: display
-                        implicitWidth: _tableItem.width / _adminTableModel.columnCount()
-                        implicitHeight: 50
+                        implicitWidth: width
+                        implicitHeight: height
+                        //width: _root.width < 640 ? 150 : _tableItem.width / _adminTableModel.columnCount()
+                        width: 150
+                        height: 50
                         Binding{
                             target: _tableDelegateItem.background
                             property: "color"
