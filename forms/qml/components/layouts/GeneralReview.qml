@@ -1,7 +1,7 @@
 import QtQuick
 import QtQuick.Controls.Material
 import QtQuick.Layouts
-import Qt5Compat.GraphicalEffects
+//import Qt5Compat.GraphicalEffects
 import Constants 1.0
 import "../../../scripts/utilities.js" as Utils
 
@@ -42,41 +42,19 @@ Item{
                         Layout.alignment: Qt.AlignVCenter | Qt.AlignLeft
                         padding: 10
                     }
-                    Item{
+                    Button{
+                        id: _stats
                         Layout.alignment: Qt.AlignVCenter | Qt.AlignRight
-                        Layout.preferredWidth: _row2L.implicitWidth
-                        Layout.preferredHeight: _row2L.implicitHeight
-                        RowLayout{
-                            id: _row2L
-                            anchors.fill: parent
-                            Item{
-                                Layout.preferredWidth: 20
-                                Layout.preferredHeight: 20
-                                Image {
-                                    id: _upArrow
-                                    source: _item1._percent < 0 ? Constants.icons.arrowDown : Constants.icons.arrowUp
-                                    fillMode: Image.PreserveAspectFit
-                                    anchors.fill: parent
-                                    ColorOverlay{
-                                        anchors.fill: _upArrow
-                                        source: _upArrow
-                                        color: _item1._percent < 0 ? Constants.colors.danger : Constants.colors.success
-                                    }
-                                }
-                            }
-                            Label{
-                                id: _usesUpdatePercentLabel
-                                text: _item1._percent < 0 ? _item1._percent.toString().substring(1) + "%" : _item1._percent + "%"
-                                padding: 10
-                                font: Constants.blackFont.h3
-                                color: _item1._percent < 0 ? Constants.colors.danger : Constants.colors.success
-                                Layout.alignment: Qt.AlignVCenter | Qt.AlignLeft
-                            }
-                        }
+                        padding: 10
+                        font: Constants.lightFont.h3
+                        Material.foreground: _item1._percent < 0 ? Constants.colors.danger : Constants.colors.success
+                        Material.background: "transparent"
+                        text: _item1._percent < 0 ? _item1._percent.toString().substring(1) + "%" : _item1._percent + "%"
+                        icon.source: _item1._percent < 0 ? Constants.icons.arrowDown : Constants.icons.arrowUp
+                        icon.color: _item1._percent < 0 ? Constants.colors.danger : Constants.colors.success
                     }
                 }
             }
-
         }
     }
 }

@@ -5,7 +5,7 @@ project(never_give_up VERSION 0.1 LANGUAGES CXX)
 set(CMAKE_AUTOMOC ON)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
-find_package(Qt6 6.2 COMPONENTS Quick Charts Core5Compat REQUIRED)
+find_package(Qt6 6.2 COMPONENTS Quick Charts WebEngineQuick REQUIRED)
 
 qt_add_executable(appnever_give_up
     main.cpp
@@ -28,6 +28,9 @@ set(BOOTSTRAP_ICONS
     forms/icons/plus.svg
     forms/icons/pen.svg
     forms/icons/dash.svg
+    forms/icons/columns-gap.svg
+    forms/icons/bookshelf.svg
+    forms/icons/funnel.svg
 )
 
 set(QML_IMAGES
@@ -39,6 +42,7 @@ set(QML_IMAGES
     forms/images/details-frame.png
     forms/images/malory-blackman.png
     forms/images/search-bar.png
+    forms/images/nzinga.png
 
     ${BOOTSTRAP_ICONS}
 )
@@ -68,12 +72,14 @@ set(QML_FILES
     forms/qml/components/customs/CustomTextField.qml
     forms/qml/components/customs/LinkButton.qml
     forms/qml/components/customs/CustomBtn.qml
+    forms/qml/components/customs/SearchField.qml
 
     forms/qml/components/layouts/NavBar.qml
     forms/qml/components/layouts/GeneralReview.qml
     forms/qml/components/layouts/DashboardMostPopularAuthor.qml
     forms/qml/components/layouts/DefaultTableView.qml
     forms/qml/components/layouts/DashboardCharts.qml
+    forms/qml/components/layouts/ComicNavHeader.qml
 
     ${QML_FONTS}
     ${QML_SCRIPTS}
@@ -95,7 +101,7 @@ set_target_properties(appnever_give_up PROPERTIES
 )
 
 target_link_libraries(appnever_give_up
-    PRIVATE Qt6::Quick Qt6::Charts Qt6::Core5Compat)
+    PRIVATE Qt6::Quick Qt6::Charts Qt6::WebEngineQuick)
 
 install(TARGETS appnever_give_up
     BUNDLE DESTINATION .

@@ -16,3 +16,28 @@ function getDashboardGeneralReview(){
         ]
     return reviews
 }
+
+function getComicFilters(icons){
+    let filters = [
+            { "model": ["Tout(s)","Romance","Tragedy","Comedy"],"icon":  icons.columnsGap},
+            { "model": ["Tout(s)","Disponible","Non-Disponible"],"icon":  icons.bookshelf},
+            { "model": ["Plus-Recent","Plus-Ancien"],"icon":  icons.funnel}
+        ]
+    return filters
+}
+
+function calculateListViewTotalHeight(listView,count){
+//    var root = listView.visibleChildren[0]
+//    var listViewHeight = 0
+//    var listViewWidth = 0
+
+//    // iterate over each delegate item to get their sizes
+//    for (var i = 0; i < root.visibleChildren.length; i++) {
+//        listViewHeight += root.visibleChildren[i].height
+//        listViewWidth  = Math.max(listViewWidth, root.visibleChildren[i].width)
+//    }
+
+//    listView.height = listViewHeight
+//    listView.width = listViewWidth
+    console.log(count)
+}

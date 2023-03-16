@@ -3,6 +3,7 @@ import QtQuick.Layouts
 import QtQuick.Controls.Material
 import Constants 1.0
 import AdminTableModel 1.0
+import "../customs"
 
 Item{
     id: _tableItem
@@ -26,20 +27,9 @@ Item{
                     font: Constants.blackFont.h3
                     Material.foreground: Constants.colors.white
                 }
-                TextField{
+                SearchField{
                     id: _searchBar
                     Layout.fillWidth: true
-                    font: Constants.lightFont.h3
-                    Material.foreground: Constants.colors.white
-                    placeholderText: "Rechercher"
-                    placeholderTextColor: Constants.colors.gray
-                    maximumLength: 255
-                    leftPadding: 10
-                    rightPadding: 10
-                    background: Rectangle{
-                        color: Constants.colors.black
-                        radius: 30
-                    }
                 }
             }
         }
@@ -69,7 +59,7 @@ Item{
                 TableView{
                     id: _dashboardTableView
                     Layout.fillWidth: true
-                    Layout.preferredHeight: _adminTableModel.rowCount() * 50//height
+                    Layout.preferredHeight: contentHeight
                     Layout.maximumHeight: 500
                     columnSpacing: 1
                     rowSpacing: 1

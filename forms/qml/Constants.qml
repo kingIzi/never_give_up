@@ -114,6 +114,7 @@ QtObject {
         readonly property url detailsFrame: "qrc:/never_give_up/forms/images/details-frame.png"
         readonly property url maloryBlackman: "qrc:/never_give_up/forms/images/malory-blackman.png"
         readonly property url searchBar: "qrc:/never_give_up/forms/images/search-bar.png"
+        readonly property url nzinga: "qrc:/never_give_up/forms/images/nzinga.png"
     }
 
     readonly property QtObject icons: QtObject{
@@ -123,5 +124,8 @@ QtObject {
         readonly property url plus: "qrc:/never_give_up/forms/icons/plus.svg"
         readonly property url pen: "qrc:/never_give_up/forms/icons/pen.svg"
         readonly property url dash: "qrc:/never_give_up/forms/icons/dash.svg"
+        readonly property url columnsGap: "qrc:/never_give_up/forms/icons/columns-gap.svg"
+        readonly property url bookshelf: "qrc:/never_give_up/forms/icons/bookshelf.svg"
+        readonly property url funnel: "qrc:/never_give_up/forms/icons/funnel.svg"
     }
 }

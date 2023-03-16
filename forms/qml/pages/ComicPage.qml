@@ -2,9 +2,10 @@ import QtQuick
 import QtQuick.Layouts
 import QtQuick.Controls.Material
 import Constants 1.0
-import Qt5Compat.GraphicalEffects
+import QtWebEngine
 import AdminTableModel 1.0
 import "../components/layouts"
+import "../components/customs"
 import "../../scripts/utilities.js" as Utils
 
 ScrollView{
@@ -20,133 +21,140 @@ ScrollView{
             id: _comicCol
             anchors.fill: parent
             spacing: 20
-            Pane{
-                id: _comicPaneHeader
+            ComicNavHeader{
+                id: _comicNavHeader
                 Layout.fillWidth: true
-                Layout.preferredHeight: _col6L.implicitHeight
-                Material.background: Constants.colors.black
+                Layout.preferredHeight: implicitHeight
+            }
+            Item{
+                Layout.fillWidth: true
+                Layout.preferredHeight: _col9L.implicitHeight
                 ColumnLayout{
-                    id: _col6L
+                    id: _col9L
                     anchors.fill: parent
                     Item{
                         Layout.fillWidth: true
-                        Layout.preferredHeight: _row7L.implicitHeight
-                        RowLayout{
-                            id: _row7L
+                        Layout.preferredHeight: _comicGrid.implicitHeight
+                        GridLayout{
+                            id: _comicGrid
                             anchors.fill: parent
-                            Label{
-                                id: _tableTitleLabel
-                                text: "In Stock"
-                                font: Constants.blackFont.h2
-                                Material.foreground: Constants.colors.white
-                                Layout.alignment: Qt.AlignVCenter
-                                Layout.fillWidth: true
-                            }
-                            ToolBar {
-                                id: _toolBar
-                                Layout.alignment: Qt.AlignRight | Qt.AlignVCenter
-                                Layout.preferredWidth: _row8L.implicitWidth
-                                Layout.preferredHeight: _row8L.implicitHeight
-                                Material.background: "transparent"
-                                background: Rectangle {
-                                    color: "transparent"
+                            columns: _root.width < 640 ? 1 : 3
+                            ListView{
+                                id: _comicListView
+                                Layout.column: _root.width < 640 ? 0 : 1
+                                Layout.fillWidth: _root.width < 640 ? true : false
+                                Layout.preferredWidth: 400
+                                Layout.preferredHeight: contentHeight
+                                spacing: 20
+                                header: Label{
+                                    id: _resultsLabel
+                                    text: "Resultat(s)"
+                                    font: Constants.blackFont.h5
+                                    Material.foreground: Constants.colors.white
+                                    horizontalAlignment: "AlignRight"
                                 }
-                                RowLayout {
-                                    id: _row8L
-                                    anchors.fill: parent
-                                    ToolButton {
-                                        icon.source: Constants.icons.plus
-                                        icon.color: Constants.colors.success
-                                    }
-                                    ToolButton {
-                                        icon.source: Constants.icons.pen
-                                        icon.color: Constants.colors.sunset
-                                    }
-                                    ToolButton {
-                                        icon.source: Constants.icons.dash
-                                        icon.color: Constants.colors.danger
-                                    }
-                                }
-                            }
-                        }
-                    }
-                    Item{
-                        Layout.fillWidth: true
-                        Layout.preferredHeight: _row10L.implicitHeight
-                        RowLayout{
-                            id: _row10L
-                            anchors.fill: parent
-//                            ComboBox {
-//                                id: _phoneNavItems
-//                                model: ["Romance","Comedy","Tragedy"]
-//                                Layout.alignment: Qt.AlignHCenter | Qt.AlignBottom
-//                                Layout.leftMargin: _root.width < 900 ? 0 : 30
-//                                Layout.rightMargin: _root.width < 900 ? 0 : 30
-//                                Layout.fillWidth: true
-//                                Material.background: "transparent"
-//                                Material.accent: Material.LightBlue
-//                                delegate: ItemDelegate {
-//                                    width: _phoneNavItems.width
-//                                    contentItem: Label {
-//                                        text: _phoneNavItems.textRole
-//                                              ? (Array.isArray(control.model) ? modelData[control.textRole] : model[control.textRole])
-//                                              : modelData
-//                                        Material.foreground: Colors
-//                                        font: _phoneNavItems.font
-//                                        elide: Text.ElideRight
-//                                        verticalAlignment: Text.AlignVCenter
+                                model: [1,2,3,4,5,6,7,8,9]
+                                delegate: Rectangle{
+                                    id: _comicItem
+                                    width: _comicListView.width
+                                    height: 150
+//                                    Image{
+//                                        id: _imageThumbnail
+//                                        anchors.fill: parent
+//                                        source: Constants.images.nzinga
+//                                        fillMode: Image.PreserveAspectCrop
 //                                    }
-//                                    highlighted: _phoneNavItems.highlightedIndex === index
-//                                }
-//                                Binding{
-//                                    target: _phoneNavItems.popup
-//                                    property: "background.color"
-//                                    value: "#141414"
-//                                }
-//                                Binding{
-//                                    target: _phoneNavItems.contentItem
-//                                    property: "color"
-//                                    value: "#fff"
-//                                }
-//                            }
-                            Item{
+                                    gradient: Gradient {
+                                            GradientStop { position: 0.0; color: Constants.colors.black }
+                                            GradientStop { position: 0.33; color: Constants.colors.primary }
+                                            GradientStop { position: 1.0; color: Constants.colors.black }
+                                        }
+                                    ColumnLayout{
+                                        id: _col
+//                                        anchors.fill: _imageThumbnail
+                                        anchors.top: parent.top
+                                        anchors.left: parent.left
+                                        anchors.right: parent.right
+                                        spacing: 10
+                                        Flow{
+                                            id: _titleFlow
+                                            Layout.fillWidth: true
+                                            spacing: 2
+                                            Label{
+                                                text: "Titre:"
+                                                font: Constants.blackFont.h5
+                                                padding: 10
+                                                Material.foreground: Constants.colors.white
+                                            }
+                                            Label{
+                                                id: _comicTitleLabel
+                                                text: "Kosambisamam ya Kimpa Vita"
+                                                font: Constants.lightFont.h4
+                                                padding: 10
+                                                Material.foreground: Constants.colors.white
+                                            }
+                                        }
+                                        Flow{
+                                            id: _authorFlow
+                                            Layout.fillWidth: true
+                                            spacing: 2
+                                            Label{
+                                                text: "Author:"
+                                                font: Constants.blackFont.h5
+                                                padding: 10
+                                                Material.foreground: Constants.colors.white
+                                            }
+                                            Label{
+                                                id: _comicAuthorLabel
+                                                text: "Malory Blackman"
+                                                font: Constants.lightFont.h5
+                                                padding: 10
+                                                Material.foreground: Constants.colors.white
+                                            }
+                                        }
+                                        Flow{
+                                            id: _releasedFlow
+                                            Layout.fillWidth: true
+                                            spacing: 2
+                                            Label{
+                                                text: "Released:"
+                                                font: Constants.blackFont.h5
+                                                padding: 10
+                                                Material.foreground: Constants.colors.white
+                                            }
+                                            Label{
+                                                id: _comicReleasedLabel
+                                                text: "2 Juillet 1706"
+                                                font: Constants.lightFont.h5
+                                                padding: 10
+                                                Material.foreground: Constants.colors.white
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                            Loader{
+                                id: _pdfLoader
+                                Layout.fillHeight: true
                                 Layout.fillWidth: true
-                                Layout.preferredHeight: _col11L.implicitHeight
-                                ColumnLayout{
-                                    id: _col11L
-                                    anchors.fill: parent
-
-                                }
-                            }
-
-                            Item{
-                                Layout.alignment: Qt.AlignRight | Qt.AlignVCenter
-                                Layout.preferredWidth: _row9L.implicitWidth
-                                Layout.preferredHeight: _row9L.implicitHeight
-                                RowLayout{
-                                    id: _row9L
-                                    anchors.fill: parent
-                                    RadioButton{
-                                        text: "Tout(s)"
-                                        Material.accent: Constants.colors.success
-                                        font: _root.width < 640 ? Constants.lightFont.h4 : Constants.lightFont.h3
-                                        Material.foreground: Constants.colors.white
-                                    }
-                                    RadioButton{
-                                        text: "Available"
-                                        Material.accent: Constants.colors.success
-                                        font: _root.width < 640 ? Constants.lightFont.h4 : Constants.lightFont.h3
-                                        Material.foreground: Constants.colors.white
-                                    }
-                                    RadioButton{
-                                        text: "Pending"
-                                        Material.accent: Constants.colors.success
-                                        font: _root.width < 640 ? Constants.lightFont.h4 : Constants.lightFont.h3
-                                        Material.foreground: Constants.colors.white
+                                Layout.columnSpan: 1
+                                Layout.column: 0
+                                visible: _root.width > 640
+                                active: visible
+                                sourceComponent: Rectangle{
+                                    id: _viewer
+                                    visible: _root.width > 640
+                                    WebEngineView{
+                                        id: _pdfWebEngine
+                                        anchors.fill: parent
+                                        url: "https://www.qt.io"
+                                        Component.onCompleted: {
+                                            //_pdfWebEngine.settings.pluginsEnabled = true
+                                            //_pdfWebEngine.settings.pdfViewerEnabled = true
+                                        }
                                     }
                                 }
                             }
-
                         }
                     }
                 }

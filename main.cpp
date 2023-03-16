@@ -3,11 +3,16 @@
 
 #include <QLocale>
 #include <QTranslator>
+#include <QtWebEngineQuick/QtWebEngineQuick>
 
 #include "admintablemodel.hpp"
 
 int main(int argc, char *argv[])
 {
+    QApplication::setOrganizationName("QtExamples");
+    QApplication::setAttribute(Qt::AA_ShareOpenGLContexts);
+    QtWebEngineQuick::initialize();
+
     QApplication app(argc, argv);
 
     QTranslator translator;
