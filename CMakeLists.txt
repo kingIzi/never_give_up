@@ -5,7 +5,7 @@ project(never_give_up VERSION 0.1 LANGUAGES CXX)
 set(CMAKE_AUTOMOC ON)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
-find_package(Qt6 6.2 COMPONENTS Quick Charts REQUIRED)
+find_package(Qt6 6.2 COMPONENTS Quick Charts Core5Compat REQUIRED)
 
 qt_add_executable(appnever_give_up
     main.cpp
@@ -92,7 +92,7 @@ set_target_properties(appnever_give_up PROPERTIES
 )
 
 target_link_libraries(appnever_give_up
-    PRIVATE Qt6::Quick Qt6::Charts)
+    PRIVATE Qt6::Quick Qt6::Charts Qt6::Core5Compat)
 
 install(TARGETS appnever_give_up
     BUNDLE DESTINATION .
