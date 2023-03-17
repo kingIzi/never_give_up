@@ -4,8 +4,11 @@ project(never_give_up VERSION 0.1 LANGUAGES CXX)
 
 set(CMAKE_AUTOMOC ON)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
+set(CMAKE_CXX_STANDARD 20)
 
-find_package(Qt6 6.2 COMPONENTS Quick Charts WebEngineQuick REQUIRED)
+
+find_package(Qt6 6.2 COMPONENTS Quick Charts REQUIRED)
+
 
 qt_add_executable(appnever_give_up
     main.cpp
@@ -31,6 +34,7 @@ set(BOOTSTRAP_ICONS
     forms/icons/columns-gap.svg
     forms/icons/bookshelf.svg
     forms/icons/funnel.svg
+    forms/icons/calendar.svg
 )
 
 set(QML_IMAGES
@@ -67,12 +71,19 @@ set(QML_FILES
     forms/qml/pages/forms/LoginForm.qml
     forms/qml/pages/forms/RegisterForm.qml
     forms/qml/pages/forms/ResetPasswordForm.qml
+    forms/qml/pages/forms/AddComicForm.qml
+    forms/qml/pages/forms/UpdateComicForm.qml
+    forms/qml/pages/forms/PromptUserForm.qml
 
     #components
     forms/qml/components/customs/CustomTextField.qml
     forms/qml/components/customs/LinkButton.qml
     forms/qml/components/customs/CustomBtn.qml
     forms/qml/components/customs/SearchField.qml
+    forms/qml/components/customs/FormTextField.qml
+    forms/qml/components/customs/FormComboBox.qml
+    forms/qml/components/customs/FormDatePicker.qml
+    forms/qml/components/customs/FormFileSelector.qml
 
     forms/qml/components/layouts/NavBar.qml
     forms/qml/components/layouts/GeneralReview.qml
@@ -101,7 +112,7 @@ set_target_properties(appnever_give_up PROPERTIES
 )
 
 target_link_libraries(appnever_give_up
-    PRIVATE Qt6::Quick Qt6::Charts Qt6::WebEngineQuick)
+    PRIVATE Qt::Quick Qt::Charts)
 
 install(TARGETS appnever_give_up
     BUNDLE DESTINATION .

@@ -22,6 +22,8 @@ QtObject {
         readonly property color link: "#5bc0de"
         readonly property color primary: "#15242D"
         readonly property color gray: "#A4A4A4"
+        readonly property color gray200: "#1B1B1B"
+        readonly property color gray500: "#1E1E1E"
         readonly property color black: "#141414"
         readonly property color success: "#399E29"
         readonly property color sunset: "#D5AC2A"
@@ -127,5 +129,6 @@ QtObject {
         readonly property url columnsGap: "qrc:/never_give_up/forms/icons/columns-gap.svg"
         readonly property url bookshelf: "qrc:/never_give_up/forms/icons/bookshelf.svg"
         readonly property url funnel: "qrc:/never_give_up/forms/icons/funnel.svg"
+        readonly property url calendar: "qrc:/never_give_up/forms/icons/calendar.svg"
     }
 }

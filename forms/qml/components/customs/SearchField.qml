@@ -7,12 +7,12 @@ TextField{
     font: Constants.lightFont.h3
     Material.foreground: Constants.colors.white
     placeholderText: "Rechercher"
-    placeholderTextColor: Constants.colors.gray
+    placeholderTextColor: Constants.colors.primary
     maximumLength: 255
     leftPadding: 10
     rightPadding: 10
     background: Rectangle{
-        color: "#0b1318"
+        color: Constants.colors.gray
         radius: 30
     }
 }
