@@ -7,7 +7,7 @@ import "../../../scripts/utilities.js" as Utils
 
 
 Popup {
-    id: _addComicForm
+    id: _addAuthorForm
     width: parent.width - 40
     height: parent.height - 40
     anchors.centerIn: parent
@@ -16,7 +16,7 @@ Popup {
         contentWidth: availableWidth
         contentHeight: _col3L.implicitHeight
         Item{
-            id: _addComicFormItem
+            id: _addAuthorFormItem
             anchors.fill: parent
             ColumnLayout{
                 id: _col3L
@@ -24,7 +24,7 @@ Popup {
                 spacing: 20
                 Label{
                     id: _tableTitleLabel
-                    text: "Ajouter une BD"
+                    text: "Modifier l'utilisateur"
                     font: Constants.blackFont.h2
                     Material.foreground: Constants.colors.white
                     Layout.alignment: Qt.AlignHCenter
@@ -38,25 +38,37 @@ Popup {
                 }
                 FormTextField{
                     id: _titleFormField
-                    _title: "Titre"
+                    _title: "Prenom, Postnom"
                     _textField.placeholderText: "Choississez un titre"
                     Layout.fillWidth: true
                     Layout.preferredHeight: implicitHeight
                 }
-                FormComboBox{
-                    _model:["Romance","Tragedy","Comedy"]
+                FormTextField{
+                    _title: "Nom"
+                    _textField.placeholderText: "Choississez un titre"
                     Layout.fillWidth: true
-                    _title: "Category"
                     Layout.preferredHeight: implicitHeight
                 }
-                FormComboBox{
-                    _model:["Malory Blackman","Michael Scott","Rosemary Stuffcrif"]
+                FormTextField{
+                    _title: "Addresse email"
+                    _textField.placeholderText: "Choississez un titre"
                     Layout.fillWidth: true
-                    _title: "Author"
+                    Layout.preferredHeight: implicitHeight
+                }
+                FormTextField{
+                    _title: "Telephone"
+                    _textField.placeholderText: "Choississez un titre"
+                    Layout.fillWidth: true
+                    Layout.preferredHeight: implicitHeight
+                }
+                FormTextField{
+                    _title: "Addresse residentielle"
+                    _textField.placeholderText: "Choississez un titre"
+                    Layout.fillWidth: true
                     Layout.preferredHeight: implicitHeight
                 }
                 FormDatePicker{
-                    _title: "Date Publier"
+                    _title: "Date de naissance"
                     Layout.fillWidth: true
                     _textField.text: "Choississez une date"
                     Layout.preferredHeight: implicitHeight
@@ -66,16 +78,6 @@ Popup {
                     Layout.fillWidth: true
                     _textField.text: "la photo profil"
                 }
-                FormFileSelector{
-                    _title: "Le BD"
-                    Layout.fillWidth: true
-                    _textField.text: "Le BD"
-                }
-                FormTextArea{
-                    _title: "Description"
-                    Layout.fillWidth: true
-                }
-
                 Item{
                     Layout.fillWidth: true
                     Layout.preferredHeight: _row8L.implicitHeight

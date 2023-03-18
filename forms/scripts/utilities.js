@@ -26,18 +26,9 @@ function getComicFilters(icons){
     return filters
 }
 
-function calculateListViewTotalHeight(listView,count){
-//    var root = listView.visibleChildren[0]
-//    var listViewHeight = 0
-//    var listViewWidth = 0
-
-//    // iterate over each delegate item to get their sizes
-//    for (var i = 0; i < root.visibleChildren.length; i++) {
-//        listViewHeight += root.visibleChildren[i].height
-//        listViewWidth  = Math.max(listViewWidth, root.visibleChildren[i].width)
-//    }
-
-//    listView.height = listViewHeight
-//    listView.width = listViewWidth
-    console.log(count)
+function getAuthorFilters(icons){
+    let filters = [
+            { "model": ["Alphabetique","Plus-Recent","Plus-Ancien"],"icon":  icons.funnel}
+        ]
+    return filters
 }

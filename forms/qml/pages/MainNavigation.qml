@@ -29,11 +29,11 @@ Page{
     }
     Component{
         id: _author
-        Rectangle{}
+        AuthorPage{}
     }
     Component{
         id: _admin
-        Rectangle{}
+        AdminsPage{}
     }
 
     contentItem: Item{

@@ -10,6 +10,8 @@ Item{
     Layout.fillWidth: true
     Layout.maximumWidth: _root.width < 640 ? parent.width : parent.width / 2
     implicitHeight: _col5L.implicitHeight
+    readonly property alias _titleLabel: _tableTitleLabel
+    property var _model: []
     ColumnLayout{
         id: _col5L
         anchors.fill: parent
@@ -23,7 +25,6 @@ Item{
                 anchors.fill: parent
                 Label{
                     id: _tableTitleLabel
-                    text: "Admin(s)"
                     font: Constants.blackFont.h3
                     Material.foreground: Constants.colors.white
                 }
@@ -41,7 +42,7 @@ Item{
                 id: _col6L
                 anchors.fill: parent
                 HorizontalHeaderView{
-                    model: ["#","First name", "Last name", "Telephone", "Date of Birth"]
+                    model: _model
                     syncView: _dashboardTableView
                     Layout.fillWidth: true
                     delegate: ItemDelegate{

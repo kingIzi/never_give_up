@@ -67,6 +67,8 @@ set(QML_FILES
     forms/qml/pages/MainNavigation.qml
     forms/qml/pages/DashboardPage.qml
     forms/qml/pages/ComicPage.qml
+    forms/qml/pages/AuthorPage.qml
+    forms/qml/pages/AdminsPage.qml
 
     forms/qml/pages/forms/LoginForm.qml
     forms/qml/pages/forms/RegisterForm.qml
@@ -74,6 +76,14 @@ set(QML_FILES
     forms/qml/pages/forms/AddComicForm.qml
     forms/qml/pages/forms/UpdateComicForm.qml
     forms/qml/pages/forms/PromptUserForm.qml
+    forms/qml/pages/forms/AddAuthorForm.qml
+    forms/qml/pages/forms/UpdateAuthorForm.qml
+    forms/qml/pages/forms/AddAdminForm.qml
+    forms/qml/pages/forms/UpdateAdminForm.qml
+    forms/qml/pages/forms/AddUserForm.qml
+    forms/qml/pages/forms/UpdateUserForm.qml
+    forms/qml/pages/forms/AddCategoryForm.qml
+    forms/qml/pages/forms/UpdateCategoryForm.qml
 
     #components
     forms/qml/components/customs/CustomTextField.qml
@@ -84,6 +94,7 @@ set(QML_FILES
     forms/qml/components/customs/FormComboBox.qml
     forms/qml/components/customs/FormDatePicker.qml
     forms/qml/components/customs/FormFileSelector.qml
+    forms/qml/components/customs/FormTextArea.qml
 
     forms/qml/components/layouts/NavBar.qml
     forms/qml/components/layouts/GeneralReview.qml
@@ -91,6 +102,9 @@ set(QML_FILES
     forms/qml/components/layouts/DefaultTableView.qml
     forms/qml/components/layouts/DashboardCharts.qml
     forms/qml/components/layouts/ComicNavHeader.qml
+    forms/qml/components/layouts/AuthorNavHeader.qml
+    forms/qml/components/layouts/AdminNavHeader.qml
+    forms/qml/components/layouts/GenericTableView.qml
 
     ${QML_FONTS}
     ${QML_SCRIPTS}

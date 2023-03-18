@@ -52,6 +52,8 @@ ScrollView{
                         id: _defaultTableView
                         Layout.fillWidth: true
                         Layout.preferredHeight: implicitHeight
+                        _titleLabel.text: "Admins"
+                        _model: ["#","First name", "Last name", "Telephone", "Date of Birth"]
                     }
                     DashboardCharts{
                         id: _dashboardChart
