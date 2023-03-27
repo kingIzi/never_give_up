@@ -11,7 +11,78 @@ Item{
     Layout.maximumWidth: _root.width < 640 ? parent.width : parent.width / 2
     implicitHeight: _col5L.implicitHeight
     readonly property alias _titleLabel: _tableTitleLabel
-    property var _model: []
+    readonly property alias _tableViewModel: _tableModel
+    Component{
+        id: _tableDel
+        Loader{
+            id: _tableDelegateItem
+            readonly property font font: Constants.blackFont.h6
+            readonly property string text: model.display
+            required property bool selected
+            required property bool current
+            width: 250
+            height: 50
+            Component{
+                id: _labelComponent
+                ItemDelegate{
+                    id: _del2
+                    font: Constants.blackFont.h6
+                    text: model.display
+                    implicitWidth: width
+                    implicitHeight: height
+                    width: _tableDelegateItem.width
+                    height: _tableDelegateItem.height
+                    Binding{
+                        target: _del2.background
+                        property: "color"
+                        value: model.row % 2 === 0 ? "#616161" : "#1F1F1F"
+                    }
+                    contentItem: Label{
+                        text: _del2.text
+                        font: _del2.font
+                        Material.foreground: Constants.colors.white
+                    }
+                    onDoubleClicked: {
+                        _itemSelectionModel.select(_tableModel.index(model.row,model.column), ItemSelectionModel.Select | ItemSelectionModel.Current)
+                    }
+                }
+            }
+            Component{
+                id: _textFieldComponent
+                ItemDelegate{
+                    id: _del1
+                    font: Constants.blackFont.h6
+                    text: model.display
+                    implicitWidth: width
+                    implicitHeight: height
+                    width: _tableDelegateItem.width
+                    height: _tableDelegateItem.height
+                    Component.onCompleted: {
+                        _dashboardTableView.selection
+                    }
+                    Binding{
+                        target: _del1.background
+                        property: "color"
+                        value: model.row % 2 === 0 ? "#616161" : "#1F1F1F"
+                    }
+                    contentItem: TextField{
+                        id: _editText
+                        onAccepted: {
+                            if (_editText.text.length === 0)
+                                _itemSelectionModel.clearSelection();
+                            else
+                                _tableModel.setItemAt(_tableModel.index(model.row,model.column),_editText.text)
+                        }
+                        focus: true
+                        text: _del1.text
+                        font: _del1.font
+                        Material.foreground: Constants.colors.white
+                    }
+                }
+            }
+            sourceComponent: _tableDelegateItem.selected ? _textFieldComponent : _labelComponent
+        }
+    }
     ColumnLayout{
         id: _col5L
         anchors.fill: parent
@@ -42,7 +113,7 @@ Item{
                 id: _col6L
                 anchors.fill: parent
                 HorizontalHeaderView{
-                    model: _model
+                    model: _tableModel.headers
                     syncView: _dashboardTableView
                     Layout.fillWidth: true
                     delegate: ItemDelegate{
@@ -54,6 +125,12 @@ Item{
                             target: _tableHeader.background
                             property: "color"
                             value: Constants.colors.black
+                        }
+                        contentItem: Label{
+                            text: _tableHeader.text
+                            font: _tableHeader.font
+                            horizontalAlignment: "AlignHCenter"
+                            Material.foreground: Constants.colors.white
                         }
                     }
                 }
@@ -67,29 +144,22 @@ Item{
                     clip: true
                     interactive: true
                     alternatingRows: true
+                    Connections{
+                        target: _tableModel
+                        function onItemChanged(item){
+                            _admin.requestUpdateUser(item)
+                        }
+                    }
+
                     model: AdminTableModel{
-                        id: _adminTableModel
+                        id: _tableModel
+                        headers: ["Full Name","Email","Phone Number","Role","Since"]
                     }
-                    delegate: ItemDelegate{
-                        id: _tableDelegateItem
-                        font: Constants.blackFont.h6
-                        text: display
-                        implicitWidth: width
-                        implicitHeight: height
-                        //width: _root.width < 640 ? 150 : _tableItem.width / _adminTableModel.columnCount()
-                        width: 150
-                        height: 50
-                        Binding{
-                            target: _tableDelegateItem.background
-                            property: "color"
-                            value: model.row % 2 === 0 ? "#616161" : "#1F1F1F"
-                        }
-                        contentItem: Label{
-                            text: _tableDelegateItem.text
-                            font: _tableDelegateItem.font
-                            horizontalAlignment: "AlignHCenter"
-                        }
+                    selectionModel: ItemSelectionModel{
+                        id: _itemSelectionModel
+                        model: _tableModel
                     }
+                    delegate: _tableDel
                 }
             }
         }

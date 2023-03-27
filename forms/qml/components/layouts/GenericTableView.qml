@@ -12,6 +12,7 @@ Item{
     implicitHeight: _col5L.implicitHeight
     property var _modelHeaders: []
     readonly property alias _titleLabel: _tableTitleLabel
+    readonly property alias _adminTableModel: _tableModel
     signal addForm()
     signal editForm()
     signal removeForm()
@@ -121,7 +122,7 @@ Item{
                     interactive: false
                     alternatingRows: true
                     model: AdminTableModel{
-                        id: _adminTableModel
+                        id: _tableModel
                     }
                     delegate: ItemDelegate{
                         id: _tableDelegateItem

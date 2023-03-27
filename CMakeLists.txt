@@ -7,16 +7,40 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_CXX_STANDARD 20)
 
 
-find_package(Qt6 6.2 COMPONENTS Quick Charts REQUIRED)
+find_package(Qt6 6.2 COMPONENTS Quick Charts Network REQUIRED)
 
 
 qt_add_executable(appnever_give_up
-    main.cpp
-
     src/include/models/admintablemodel.hpp
+    src/include/models/admintabledata.hpp
 
     src/src/models/admintablemodel.cpp
+    src/src/models/admintabledata.cpp
+
+    src/src/request.cpp
+    src/src/admin.cpp
+    src/src/response.cpp
+    src/src/main.cpp
+
+    src/include/request.hpp
+    src/include/response.hpp
+    src/include/admin.hpp
+
 )
+
+#add_library(
+#appnever_give_up
+#src/include/models/admintablemodel.hpp
+#src/src/models/admintablemodel.cpp
+
+#src/src/request.cpp
+#src/src/admin.cpp
+#src/src/response.cpp
+
+#src/include/request.hpp
+#src/include/response.hpp
+#src/include/admin.hpp
+#)
 
 set(QML_FONTS
     forms/fonts/static/Montserrat-Bold.ttf
@@ -52,9 +76,13 @@ set(QML_IMAGES
 )
 
 include_directories(src/include/models)
+include_directories(src/include)
+
+#add_subdirectory(testing/never_give_up_tests)
 
 set(QML_SCRIPTS
     forms/scripts/utilities.js
+    forms/scripts/requests.js
 )
 
 set(QML_FILES
@@ -105,6 +133,7 @@ set(QML_FILES
     forms/qml/components/layouts/AuthorNavHeader.qml
     forms/qml/components/layouts/AdminNavHeader.qml
     forms/qml/components/layouts/GenericTableView.qml
+    forms/qml/components/layouts/LoadingScreen.qml
 
     ${QML_FONTS}
     ${QML_SCRIPTS}
@@ -126,7 +155,7 @@ set_target_properties(appnever_give_up PROPERTIES
 )
 
 target_link_libraries(appnever_give_up
-    PRIVATE Qt::Quick Qt::Charts)
+    PRIVATE Qt::Quick Qt::Charts Qt::Network)
 
 install(TARGETS appnever_give_up
     BUNDLE DESTINATION .

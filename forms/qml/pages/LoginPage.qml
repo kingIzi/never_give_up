@@ -3,6 +3,7 @@ import QtQuick.Layouts
 import QtQuick.Controls.Material
 import Constants 1.0
 import "../components/customs"
+import "../components/layouts"
 import "./forms"
 
 Page{
@@ -11,6 +12,9 @@ Page{
     height: Constants.height
     background: Image{
         source: Constants.images.loginBg
+    }
+    LoadingScreen{
+        id: _loadingScreen
     }
 
     StackView{

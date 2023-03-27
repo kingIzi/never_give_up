@@ -3,6 +3,7 @@ import QtQuick.Layouts
 import QtQuick.Controls.Material
 import Constants 1.0
 import "../../components/customs"
+import "../../../scripts/requests.js" as Req
 
 ColumnLayout{
     id: _loginForm
@@ -15,6 +16,18 @@ ColumnLayout{
         id: _resetPasswordForm
         ResetPasswordForm{}
     }
+    Connections{
+        target: _admin
+        function onErrorMessageChanged(error){
+            _emailTextField._textLabelError.text = _admin.errorMessage.message
+        }
+        function onCurrentUserChanged(){
+            if (_admin.currentUser.role === "ADMIN"){
+                _appLoader.state = "navigate"
+            }
+        }
+    }
+
     Label{
         id: _loginLabel
         text: "Bienvenu"
@@ -24,15 +37,21 @@ ColumnLayout{
         bottomPadding: 20
     }
     CustomTextField{
+        id: _emailTextField
+        readonly property string _email: _emailTextField._textField.text
         Layout.fillWidth: true
         _textLabel.text: "Addresse Email"
         _textField.placeholderText: "Votre Email"
+        _textField.text: "admin@admin.com"
         _textField.validator: RegularExpressionValidator { regularExpression: /\w+([-+.']\w+)*@\w+([-.]\w+)*\.\w+([-.]\w+)*/ }
     }
     CustomTextField{
+        id: _passwordTextField
+        readonly property string _password: _passwordTextField._textField.text
         Layout.fillWidth: true
         _textLabel.text: "Mot de passe"
         _textField.placeholderText: "Votre mot de passe"
+        _textField.text: "admin123456"
         _textField.echoMode: TextField.Password
     }
     Item{
@@ -61,7 +80,12 @@ ColumnLayout{
     CustomBtn{
         text: "Connecter vous"
         Layout.alignment: Qt.AlignHCenter
-        onButtonClicked: _appLoader.state ="navigate";
+        onButtonClicked: {
+            _emailTextField._textLabelError.text = ""
+            const loginUser = Req.loginUser(_emailTextField._email,_passwordTextField._password)
+            _admin.requestLoginUser(loginUser)
+            //_appLoader.state ="navigate";
+        }
     }
     Flow{
         Layout.alignment: Qt.AlignHCenter

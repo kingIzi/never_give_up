@@ -1,0 +1,8 @@
+# ninja log v5
+2	1541	7008561936447235	sessionTests_autogen/timestamp	3325c5a54158fb2c
+9500	9874	7008562022488647	sessionTests.exe	9c2d7d95fa2591ba
+2	1541	7008561936447235	sessionTests_autogen/mocs_compilation.cpp	3325c5a54158fb2c
+1546	9488	7008562018627435	CMakeFiles/sessionTests.dir/tst_sessiontests.cpp.obj	777e9bd2adaa03a0
+2	1541	7008561936447235	C:/Users/scott/OneDrive/Documents/Development/c++/never_give_up/testing/build-never_give_up_tests-Desktop_Qt_6_4_2_MinGW_64_bit-Debug/sessionTests_autogen/timestamp	3325c5a54158fb2c
+2	1541	7008561936447235	C:/Users/scott/OneDrive/Documents/Development/c++/never_give_up/testing/build-never_give_up_tests-Desktop_Qt_6_4_2_MinGW_64_bit-Debug/sessionTests_autogen/mocs_compilation.cpp	3325c5a54158fb2c
+1542	1614	7008561939999271	CMakeFiles/sessionTests.dir/sessionTests_autogen/mocs_compilation.cpp.obj	59e371c7ec76b07c

@@ -6,11 +6,23 @@ import Qt5Compat.GraphicalEffects
 import AdminTableModel 1.0
 import "../components/layouts"
 import "../../scripts/utilities.js" as Utils
+import "../../scripts/requests.js" as Req
 
 ScrollView{
     id: _dashboardScroll
     contentWidth: availableWidth
     contentHeight: _dashboardContentItem.implicitHeight
+    Connections{
+        target: _admin
+        function onReadUsersList(users){
+            _defaultTableView._tableViewModel.populate(users)
+        }
+    }
+    Component.onCompleted: {
+        const users = Req.availableUsersList()
+        _admin.requestUsersList(users)
+    }
+
     Item{
         id: _dashboardContentItem
         width: _dashboardScroll.contentWidth
@@ -53,7 +65,10 @@ ScrollView{
                         Layout.fillWidth: true
                         Layout.preferredHeight: implicitHeight
                         _titleLabel.text: "Admins"
-                        _model: ["#","First name", "Last name", "Telephone", "Date of Birth"]
+                        Component.onCompleted: {
+                            const users = Req.availableUsersList();
+                            _admin.requestUsersList(users)
+                        }
                     }
                     DashboardCharts{
                         id: _dashboardChart
