@@ -6,17 +6,18 @@
 void AdminTableModel::populationSignals()
 {
     if (this->adminTableData_ptr){
-        QObject::connect(this->adminTableData_ptr,&AdminTableData::postItemAppended,this,[=](){
-            const auto index = this->adminTableData_ptr->getAdmins().size();
+        QObject::connect(this->adminTableData_ptr2,&AdminTableData::postItemAppended,this,[this](){
+            //const auto index = this->adminTableData_ptr->getAdmins().size();
+            const auto index = this->adminTableData_ptr2->getPersons().size();
             this->beginInsertRows(QModelIndex(),index,index);
         });
-        QObject::connect(this->adminTableData_ptr,&AdminTableData::postItemAppended,this,[=](){
+        QObject::connect(this->adminTableData_ptr2,&AdminTableData::postItemAppended,this,[this](){
             this->endInsertRows();
         });
-        QObject::connect(this->adminTableData_ptr,&AdminTableData::preItemRemoved,this,[=](QModelIndex index){
+        QObject::connect(this->adminTableData_ptr2,&AdminTableData::preItemRemoved,this,[this](QModelIndex index){
             this->beginRemoveRows(QModelIndex(),index.row(),index.row());
         });
-        QObject::connect(this->adminTableData_ptr,&AdminTableData::postItemRemoved,this,[=](){
+        QObject::connect(this->adminTableData_ptr2,&AdminTableData::postItemRemoved,this,[this](){
             this->endRemoveRows();
         });
     }
@@ -26,17 +27,23 @@ AdminTableModel::AdminTableModel(QAbstractTableModel *parent)
     : QAbstractTableModel{parent},
       request(nullptr),
       response(nullptr),
-      adminTableData_ptr(nullptr)
+      adminTableData_ptr(nullptr),
+      adminTableData_ptr2(nullptr)
 {
     QObject::connect(this,&AdminTableModel::populate,this,&AdminTableModel::onPopulate);
     QObject::connect(this,&AdminTableModel::updatedItem,this,&AdminTableModel::onUpdatedItem);
 }
 
+AdminTableModel::~AdminTableModel()
+{
+    qDebug() << "Admin Table Model destroyed";
+}
+
 int AdminTableModel::rowCount(const QModelIndex &) const
 {
-    if (!this->adminTableData_ptr)
+    if (!this->adminTableData_ptr2)
         return 0;
-    return this->adminTableData_ptr->getAdmins().size();
+    return this->adminTableData_ptr2->getPersons().size();
 }
 
 int AdminTableModel::columnCount(const QModelIndex &) const
@@ -67,8 +74,8 @@ QVariant AdminTableModel::data(const QModelIndex &index, int role) const
 }
 
 const QVariant AdminTableModel::switchDataResponse(const QModelIndex& index) const{
-    if (this->adminTableData_ptr){
-        const auto& users = this->adminTableData_ptr->getTableData();
+    if (this->adminTableData_ptr2){
+        const auto& users = this->adminTableData_ptr2->getTableData();
         switch (index.column()){
         case 0:
             return users.at(index.row()).at(index.column()).toString();
@@ -92,11 +99,6 @@ QHash<int, QByteArray> AdminTableModel::roleNames() const
     return { {Qt::DisplayRole, "display"} };
 }
 
-AdminTableData *AdminTableModel::tableData() const
-{
-    return this->adminTableData_ptr;
-}
-
 const QStringList AdminTableModel::headers() const
 {
     return this->tableHeaders;
@@ -112,65 +114,73 @@ Request *AdminTableModel::tableRequests() const
     return this->request;
 }
 
+AdminTableData *AdminTableModel::adminTableData() const
+{
+    return this->adminTableData_ptr2;
+}
+
 void AdminTableModel::setItemAt(const QModelIndex& index,const QString data)
 {
+    if (data.isEmpty()) { return; }
     this->beginResetModel();
     switch (index.column()) {
     case 0:
-        this->adminTableData_ptr->getModifiableAdmins()[index.row()].fullName = data.trimmed();
+        this->adminTableData_ptr2->getModifiablePersons()[index.row()]->setfullName(data.trimmed());
         break;
     case 1:
-        this->adminTableData_ptr->getModifiableAdmins()[index.row()].email = data.trimmed();
+        this->adminTableData_ptr2->getModifiablePersons()[index.row()]->setEmail(data.trimmed());
         break;
     case 2:
-        this->adminTableData_ptr->getModifiableAdmins()[index.row()].phoneNumber = data.trimmed();
+        this->adminTableData_ptr2->getModifiablePersons()[index.row()]->setPhoneNumber(data.trimmed());
         break;
     case 3:
-        this->adminTableData_ptr->getModifiableAdmins()[index.row()].role = data.trimmed();
-        break;
-    case 4:
-        this->adminTableData_ptr->getModifiableAdmins()[index.row()].dateCreated = QDateTime::fromString(data.trimmed(),res::dateTimeFormatShort);
+        this->adminTableData_ptr2->getModifiablePersons()[index.row()]->setRole(data.trimmed());
         break;
     default:
         break;
     }
-    this->adminTableData_ptr->itemModified();
+    this->adminTableData_ptr2->itemModified();
     this->populationSignals();
     this->endResetModel();
-    //emit AdminTableModel::itemChanged(this->adminTableData_ptr->getAdmins().at(index.row()));
 }
 
-res::FoundUser AdminTableModel::findItemAt(const QModelIndex& index) const
+Person *AdminTableModel::findItemAt(const QModelIndex &index) const
 {
-    return this->adminTableData_ptr->getAdmins().at(index.row());
+    return this->adminTableData_ptr->getPersons().at(index.row());
 }
 
-void AdminTableModel::onPopulate(const QList<res::FoundUser> users)
+QVariantMap AdminTableModel::getItemAtAsMap(const QModelIndex &index) const
 {
-    if (this->adminTableData_ptr && this->adminTableData_ptr->getAdmins() == users){
+    const auto& person = this->adminTableData_ptr->getPersons().at(index.row());
+    return person->getAsMap();
+}
+
+void AdminTableModel::onPopulate(const QList<Person*> persons)
+{
+    if (this->adminTableData_ptr && this->adminTableData_ptr->getPersons() == persons){
         return;
     }
     this->beginResetModel();
-    if (this->adminTableData_ptr){
-        this->adminTableData_ptr->disconnect(this);
-        this->adminTableData_ptr->deleteLater();
+    if (this->adminTableData_ptr2){
+        this->adminTableData_ptr2->disconnect(this);
+        this->adminTableData_ptr2->deleteLater();
     }
-    this->adminTableData_ptr = new AdminTableData(users);
+    this->adminTableData_ptr2 = new AdminTableData(persons);
+    //this->adminTableData_ptr = std::make_unique<AdminTableData>(persons);
     this->populationSignals();
     this->endResetModel();
 
 }
 
-void AdminTableModel::onUpdatedItem(const res::FoundUser item)
+void AdminTableModel::onUpdatedItem(Person *person)
 {
-    qDebug() << this->adminTableData_ptr->getAdmins().size();
-    const auto it = std::find_if(std::begin(this->adminTableData_ptr->getAdmins()),std::end(this->adminTableData_ptr->getAdmins()),[item](const res::FoundUser& value){
-        return item.userId.compare(value.userId) == 0;
+    const auto it = std::find_if(std::begin(this->adminTableData_ptr->getPersons()),std::end(this->adminTableData_ptr->getPersons()),[person](const Person* value){
+        return person->userId().compare(value->userId()) == 0;
     });
-    if (it != std::end(this->adminTableData_ptr->getAdmins())){
+    if (it != std::end(this->adminTableData_ptr->getPersons())){
         qDebug() << "ITEM FOUND";
         this->beginResetModel();
-        this->adminTableData_ptr->setItemAt(std::distance(it,this->adminTableData_ptr->getAdmins().end()),item);
+        this->adminTableData_ptr->setItemAt(std::distance(it,std::end(this->adminTableData_ptr->getPersons())),person);
         this->populationSignals();
         this->endResetModel();
     }
@@ -194,12 +204,10 @@ void AdminTableModel::setTableRequests(Request *request)
     emit AdminTableModel::tableRequestsChanged();
 }
 
-void AdminTableModel::setTableData(AdminTableData *adminTableData)
+void AdminTableModel::setAdminTableData(AdminTableData *adminTableData)
 {
-    if (this->adminTableData_ptr){
-        this->adminTableData_ptr->disconnect(this);
-        this->adminTableData_ptr->deleteLater();
+    if (this->adminTableData_ptr2 != adminTableData){
+        this->adminTableData_ptr2 = adminTableData;
+        emit AdminTableModel::adminTableDataChanged();
     }
-    this->adminTableData_ptr = adminTableData;
 }
-

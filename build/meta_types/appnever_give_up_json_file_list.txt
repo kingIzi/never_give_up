@@ -1,6 +1,0 @@
-C:/Users/scott/OneDrive/Documents/Development/c++/never_give_up/build/appnever_give_up_autogen/include/../7PH6M6IPMC/moc_admin.cpp.json
-C:/Users/scott/OneDrive/Documents/Development/c++/never_give_up/build/appnever_give_up_autogen/include/../7PH6M6IPMC/moc_agent.cpp.json
-C:/Users/scott/OneDrive/Documents/Development/c++/never_give_up/build/appnever_give_up_autogen/include/../7PH6M6IPMC/moc_request.cpp.json
-C:/Users/scott/OneDrive/Documents/Development/c++/never_give_up/build/appnever_give_up_autogen/include/../7PH6M6IPMC/moc_response.cpp.json
-C:/Users/scott/OneDrive/Documents/Development/c++/never_give_up/build/appnever_give_up_autogen/include/../XJMTMC7TE7/moc_admintabledata.cpp.json
-C:/Users/scott/OneDrive/Documents/Development/c++/never_give_up/build/appnever_give_up_autogen/include/../XJMTMC7TE7/moc_admintablemodel.cpp.json

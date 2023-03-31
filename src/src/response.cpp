@@ -1,5 +1,7 @@
 #include "response.hpp"
 
+#include <QQmlEngine>
+
 const QJsonValue Response::parseLoginResponse(const QJsonDocument &response)
 {
     const auto loginError = [](const QJsonObject& status,const int& code){
@@ -102,9 +104,11 @@ const res::Login Response::createLogin(const QJsonObject& res) const noexcept{
     return res::Login(idToken,localId,email,expiresIn,refreshToken);
 }
 
-const res::FoundUser Response::createFoundUser(const QJsonObject &res, const res::Register& registeredUser) const noexcept
+Person* Response::createPerson(const QJsonObject &personRes) const noexcept
 {
-    return res::FoundUser (res,registeredUser);
+    const auto person = new Person(personRes);
+    QQmlEngine::setObjectOwnership(person,QQmlEngine::CppOwnership);
+    return person;
 }
 
 const res::FoundUser Response::createFoundUser(const QJsonObject &res) const noexcept
@@ -112,14 +116,14 @@ const res::FoundUser Response::createFoundUser(const QJsonObject &res) const noe
     return res::FoundUser(res);
 }
 
-const QList<res::FoundUser> Response::createFoundUserTableData(const QJsonArray &array) const noexcept
+const QList<Person*> Response::createPersonList(const QJsonArray &personsRes) const noexcept
 {
-    QList<res::FoundUser> admins; admins.reserve(array.size());
-    for (const auto& item : array){
-        const auto admin = res::FoundUser(item.toObject());
-        admins.emplaceBack(admin);
-    }
-    return admins;
+    QList<Person*> persons; persons.reserve(personsRes.size());
+    std::for_each(std::begin(personsRes),std::end(personsRes),[this,&persons](const QJsonValue& value){
+        const auto person = this->createPerson(value.toObject());
+        persons.emplaceBack(person);
+    });
+    return persons;
 }
 
 const res::Author Response::createAuthor(const QJsonObject &author) const noexcept

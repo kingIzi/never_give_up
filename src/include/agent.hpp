@@ -37,7 +37,7 @@ public:
     Q_INVOKABLE  void storeAgentAuth() const;
     Q_INVOKABLE void requestLogin(const QVariantMap body);
     Q_INVOKABLE void requestUsersList(const QVariantMap body);
-    Q_INVOKABLE void requestUserUpdate(const QString userId,const res::FoundUser user);
+    Q_INVOKABLE void requestUserUpdate(const QString userId,const Person* user);
     const bool isRequesting() const;
     const bool isLoggedIn() const;
 
@@ -48,7 +48,9 @@ signals:
     void isLoggedInChanged();
 
     //requests
-    void usersList(const QList<res::FoundUser>);
-    void updatedUser(const res::FoundUser);
+    //void usersList(const QList<res::FoundUser>);
+    //void updatedUser(const res::FoundUser);
+    void usersList(const QList<Person*>);
+    void updatedUser(const Person*);
 };
 

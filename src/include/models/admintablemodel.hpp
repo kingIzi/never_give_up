@@ -12,17 +12,18 @@ class AdminTableModel : public QAbstractTableModel
     Q_PROPERTY(Request* tableRequests READ tableRequests WRITE setTableRequests NOTIFY tableRequestsChanged);
     Q_PROPERTY(Response* tableResponse READ tableResponse WRITE setTableResponse NOTIFY tableResponseChanged);
     Q_PROPERTY(QStringList headers READ headers WRITE setHeaders NOTIFY headersChanged);
-    Q_PROPERTY(AdminTableData* tableData READ tableData WRITE setTableData NOTIFY tableDataChanged)
-    //Q_PROPERTY(AdminTableData* adminTableData READ adminTableData WRITE setAdminTableData NOTIFY adminTableDataChanged)
+    Q_PROPERTY(AdminTableData* adminTableData READ adminTableData WRITE setAdminTableData NOTIFY adminTableDataChanged)
 private:
     QStringList tableHeaders;
-    AdminTableData* adminTableData_ptr;
+    AdminTableData* adminTableData_ptr2;
+    std::unique_ptr<AdminTableData> adminTableData_ptr;
     Request* request;
     Response* response;
 private:
     void populationSignals();
 public:
     explicit AdminTableModel(QAbstractTableModel * parent = nullptr);
+    ~AdminTableModel();
 
     int rowCount(const QModelIndex & = QModelIndex()) const override;
 
@@ -33,33 +34,36 @@ public:
 
     QHash<int, QByteArray> roleNames() const override;
 
-    AdminTableData* tableData() const;
-
     const QStringList headers() const;
-    //const AdminTableData* adminTableData() const;
     Response* tableResponse() const;
     Request* tableRequests() const;
+    AdminTableData* adminTableData() const;
 
     Q_INVOKABLE void setItemAt(const QModelIndex& index,const QString data);
-    Q_INVOKABLE res::FoundUser findItemAt(const QModelIndex& index) const;
-
+    //Q_INVOKABLE res::FoundUser findItemAt(const QModelIndex& index) const;
+    Q_INVOKABLE Person* findItemAt(const QModelIndex& index) const;
+    Q_INVOKABLE QVariantMap getItemAtAsMap(const QModelIndex& index) const;
 signals:
     void headersChanged();
-    void populate(const QList<res::FoundUser>);
+    //void populate(const QList<res::FoundUser>);
+    void populate(const QList<Person*>);
     void tableRequestsChanged();
     void tableResponseChanged();
     void tableDataChanged();
     void itemChanged(const res::FoundUser);
-    void updatedItem(const res::FoundUser);
+    //void updatedItem(const res::FoundUser);
+    void updatedItem(Person*);
+    void adminTableDataChanged();
     //void adminTableDataChanged();
 
 public slots:
-    void onPopulate(const QList<res::FoundUser> users);
-    void onUpdatedItem(const res::FoundUser item);
+    void onPopulate(const QList<Person*> users);
+    //void onUpdatedItem(const res::FoundUser item);
+    void onUpdatedItem(Person* person);
     void setHeaders(const QStringList& headers);
     void setTableResponse(Response* response);
     void setTableRequests(Request* request);
-    void setTableData(AdminTableData* adminTableData);
+    void setAdminTableData(AdminTableData* adminTableData);
     //void setAdminTableData(AdminTableData* adminTableData);
 };
 

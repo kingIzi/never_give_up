@@ -42,7 +42,7 @@ void Agent::onRequestUsersList(const QJsonDocument res){
     try{
         const auto data = this->response.parseLoginResponse(res);
         if (!data.isNull()){
-            const auto users = this->response.createFoundUserTableData(data.toArray());
+            const auto users = this->response.createPersonList(data.toArray());
             emit Agent::usersList(users);
         }
     }
@@ -62,8 +62,8 @@ void Agent::onRequestUserUpdate(const QJsonDocument res)
     try{
         const auto data = this->response.parseResponse(res);
         if (!data.isNull()){
-            const auto user = this->response.createFoundUser(data.toObject());
-            emit Agent::updatedUser(user);
+            const auto person = this->response.createPerson(data.toObject());
+            emit Agent::updatedUser(person);
         }
     }
     catch(const QException& e){
@@ -147,7 +147,7 @@ void Agent::requestUsersList(const QVariantMap body){
     }
 }
 
-void Agent::requestUserUpdate(const QString userId,const res::FoundUser user)
+void Agent::requestUserUpdate(const QString userId,const Person* person)
 {
     const QSettings settings("IziIndustries","BoyebiApp");
     const auto idToken = settings.value("idToken").toString();
@@ -155,11 +155,9 @@ void Agent::requestUserUpdate(const QString userId,const res::FoundUser user)
        const auto queries = (QList<std::pair<QString,QString>>) {std::make_pair("userId",userId)};
        const auto url = this->request_ptr->buildUrl(queries,Request::Endpoint::userUpdateOne);
        QObject::connect(this->request_ptr.get(),&Request::replyReadyRead,this,&Agent::onRequestUserUpdate);
-       const auto reply = this->request_ptr->makeMultiPutRequest(url,idToken,user.userModifiableValuesDocumentForm());
-       if (reply){
-           this->setIsRequesting(true);
-           this->request_ptr->connectReplyReadyRead(reply);
-       }
+       const auto reply = this->request_ptr->makeMultiPutRequest(url,idToken,person->userModifiableValuesDocumentForm());
+       this->setIsRequesting(true);
+       this->request_ptr->connectReplyReadyRead(reply);
     }
     catch(const QException& e){
         qDebug() << e.what();

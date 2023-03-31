@@ -1,3 +1,0 @@
-C:\Qt\Tools\CMake_64\bin\cmake.exe -E rm -f CMakeFiles\appnever_give_up.dir/objects.a
-C:\Qt\Tools\mingw1120_64\bin\ar.exe qc CMakeFiles\appnever_give_up.dir/objects.a @CMakeFiles\appnever_give_up.dir\objects1.rsp
-C:\Qt\Tools\mingw1120_64\bin\c++.exe -mwindows -Wl,--whole-archive CMakeFiles\appnever_give_up.dir/objects.a -Wl,--no-whole-archive -o appnever_give_up.exe -Wl,--out-implib,libappnever_give_up.dll.a -Wl,--major-image-version,0,--minor-image-version,0 @CMakeFiles\appnever_give_up.dir\linklibs.rsp

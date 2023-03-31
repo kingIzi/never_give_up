@@ -33,10 +33,12 @@ int main(int argc, char *argv[])
 
     Admin admin("http://localhost:8084");
     Agent agent;
+    AdminTableData adminTableData;
     QQmlApplicationEngine engine;
     const QUrl url(u"qrc:/never_give_up/forms/qml/main.qml"_qs);
     engine.rootContext()->setContextProperty("_agent",&agent);
     engine.rootContext()->setContextProperty("_admin",&admin);
+    engine.rootContext()->setContextProperty("_adminTableData",&adminTableData);
 
     qmlRegisterType<AdminTableModel>("AdminTableModel",1,0,"AdminTableModel");
     qmlRegisterSingletonType(QUrl("qrc:/never_give_up/forms/qml/Constants.qml"), "Constants", 1, 0, "Constants");

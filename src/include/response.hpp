@@ -4,6 +4,7 @@
 #include <QDate>
 #include <QDateTime>
 #include <QStringList>
+#include "person.hpp"
 #include "request.hpp"
 
 namespace res{
@@ -398,9 +399,11 @@ public:
 
     const res::Error createError(const QJsonObject& error) const noexcept;
     const res::Login createLogin(const QJsonObject& object) const noexcept;
-    const res::FoundUser createFoundUser(const QJsonObject& res,const res::Register& registeredUser) const noexcept;
+    //const res::FoundUser createFoundUser(const QJsonObject& res,const res::Register& registeredUser) const noexcept;
+    Person* createPerson(const QJsonObject& personRes) const noexcept;
     const res::FoundUser createFoundUser(const QJsonObject& res) const noexcept;
-    const QList<res::FoundUser> createFoundUserTableData(const QJsonArray& array) const noexcept;
+    //const QList<res::FoundUser> createFoundUserTableData(const QJsonArray& array) const noexcept;
+    const QList<Person*> createPersonList(const QJsonArray& personsRes) const noexcept;
     const res::Author createAuthor(const QJsonObject& author) const noexcept;
     void connectNewReply(QNetworkReply * reply);
 	QNetworkReply* getReply() const;

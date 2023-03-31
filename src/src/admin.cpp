@@ -103,9 +103,9 @@ void Admin::onFindActiveAgent(const QJsonDocument document) {
     try{
         const auto response = this->response_ptr->parseResponse(document);
         if (response.isNull()) { return; }
-        const auto users = this->response_ptr->createFoundUserTableData(response.toArray());
-        if (!users.isEmpty())
-            this->setCurrentUser(users.front());
+        //const auto users = this->response_ptr->createFoundUserTableData(response.toArray());
+        //if (!users.isEmpty())
+        //    this->setCurrentUser(users.front());
         this->setIsLoading(false);
     }
     catch(const std::exception& e){
@@ -136,8 +136,8 @@ void Admin::onUsersList(const QJsonDocument document)
     const auto response = this->response_ptr->parseResponse(document);
     this->setIsLoading(false);
     if (response.isNull()) { return; }
-    const auto users = this->response_ptr->createFoundUserTableData(response.toArray());
-    emit Admin::readUsersList(users);
+    //const auto users = this->response_ptr->createFoundUserTableData(response.toArray());
+    //emit Admin::readUsersList(users);
 }
 
 void Admin::onCreateAuthor(const QJsonDocument document) {

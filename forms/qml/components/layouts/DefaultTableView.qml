@@ -25,7 +25,8 @@ Item{
         function onUpdatedUser(updatedUser){
 //            const users = Req.availableUsersList()
 //            _agent.requestUsersList(users)
-            _tableModel.onUpdatedItem(updatedUser)
+            //_tableModel.onUpdatedItem(updatedUser)
+            console.log(updatedUser)
         }
     }
     Component{
@@ -89,8 +90,9 @@ Item{
                             }
                             else{
                                 _tableModel.setItemAt(_tableModel.index(model.row,model.column),_editText.text)
-                                const item = _tableModel.findItemAt(_tableModel.index(model.row,model.column))
-                                _agent.requestUserUpdate(item.userId,item)
+                                const userId = _tableModel.getItemAtAsMap(_tableModel.index(model.row,model.column)).userId
+                                const person = _tableModel.findItemAt(_tableModel.index(model.row,model.column))
+                                _agent.requestUserUpdate(userId,person)
                             }
                         }
                         focus: true
@@ -167,6 +169,7 @@ Item{
                     model: AdminTableModel{
                         id: _tableModel
                         headers: ["Full Name","Email","Phone Number","Role","Since"]
+
                     }
                     selectionModel: ItemSelectionModel{
                         id: _itemSelectionModel
