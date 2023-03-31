@@ -26,8 +26,8 @@ const char* Request::URL_FORMAT_REGEX = "^(https?:\/\/)?[0-9a-z]+\.[-_0-9a-z]+\.
 
 //construct class initializes all members
 Request::Request(const QString& baseUrl, QObject* parent) :
-	baseUrl(baseUrl), manager(std::make_unique<QNetworkAccessManager>()), isOperating(false),
-    idToken(),QObject{parent}
+    QObject{parent},idToken(),multiPart(nullptr),baseUrl(baseUrl),
+    manager(std::make_unique<QNetworkAccessManager>()), isOperating(false)
 {
 	try {
 		if (this->baseUrl == nullptr)
@@ -68,7 +68,7 @@ void Request::setIsOperating(const bool isOperating) {
 }
 
 //returns network manager
-QNetworkAccessManager* Request::getManager() const {
+QNetworkAccessManager* Request::getManager() {
 	return this->manager.get();
 }
 
@@ -145,32 +145,26 @@ QNetworkReply* Request::makeRequestNoIdtoken(const QUrl& url, const QJsonDocumen
      QNetworkRequest request(url);
      request.setHeader(QNetworkRequest::ContentTypeHeader, "application/json");
      const auto reply = this->manager->post(request, document.toJson());
-     this->setIsOperating(true);
+     QObject::connect(reply,&QNetworkReply::uploadProgress,this,&Request::uploadProgressChanged);
      return reply;
 }
 
 QNetworkReply* Request::makeMultiPutRequest(const QUrl& url, const QString& idToken, const QJsonDocument& document) {
-	if (idToken.isEmpty())
-		throw std::runtime_error("NO IDTOKEN FOUND TO REQUEST");
-	if (document.isEmpty())
-		return nullptr;
-	if (!url.isValid())
-		throw std::runtime_error("RUNTIME ERROR: INVALID_URL");
+    if (idToken.isEmpty())
+        throw std::runtime_error("NO IDTOKEN FOUND TO REQUEST");
+    if (document.isNull() || document.isEmpty())
+        return nullptr;
+    if (!url.isValid())
+        throw std::runtime_error("RUNTIME ERROR: INVALID_URL");
 
-	auto * multiPart = new QHttpMultiPart(QHttpMultiPart::FormDataType);
-	const auto parts = this->buildRequestHttpParts(document, multiPart);
-	if (parts.isEmpty())
-		return nullptr;
-
-	std::for_each(parts.begin(), parts.end(), [multiPart](const QHttpPart & part) { multiPart->append(part); });
-	QNetworkRequest request(url);
-	const auto headerBearerToken = QString("Bearer %1").arg(idToken);
-	request.setRawHeader(QByteArray("Authorization"), headerBearerToken.toUtf8());
-
-	const auto reply = this->manager->put(request, multiPart);
-	multiPart->setParent(reply);
-	this->setIsOperating(true);
-	return reply;
+    this->multiPart = std::make_unique<QHttpMultiPart>(QHttpMultiPart::FormDataType);
+    this->appendHttpParts(document);
+    QNetworkRequest request(url);
+    const auto headerBearerToken = QString("Bearer %1").arg(idToken);
+    request.setRawHeader(QByteArray("Authorization"), headerBearerToken.toUtf8());
+    const auto reply = this->manager->put(request,this->multiPart.get());
+    this->multiPart->setParent(reply);
+    return reply;
 }
 
 QNetworkReply* Request::makeGetRequest(const QUrl& url, const QString& idToken) {
@@ -233,26 +227,35 @@ const QByteArray Request::buildRawJsonFromDocument(const QJsonDocument& document
 	return ((QByteArray) document.toJson()).insert(0, "form-data; ");
 }
 
-void Request::appendHttpFilePart(QList<QHttpPart>& parts, const QJsonObject& filesObj, QHttpMultiPart* multiPart) const {
-	if (!filesObj.isEmpty()) {
-		for (const auto& fileKey : filesObj.keys()) {
-			QFileInfo fileInfo(filesObj.value(fileKey).toString());
-			if (!fileInfo.isFile())
-				throw std::invalid_argument("Error! Files are invalid");
+const QString Request::contentDispositionValue(const QString key) const
+{
+    return QString("form-data; name=\"" + key + "\"");
+}
 
-			QVariantMap fileData;
-			fileData.insert(fileKey, fileInfo.fileName());
-			QHttpPart filePart;
-			filePart.setHeader(QNetworkRequest::ContentTypeHeader, QMimeDatabase().mimeTypeForFile(fileInfo.absoluteFilePath()).name());
-			filePart.setHeader(QNetworkRequest::ContentDispositionHeader,
-			                   this->buildRawJsonFromDocument(QJsonDocument::fromVariant(fileData)));
-			auto * file = new QFile(fileInfo.absoluteFilePath());
-			if (file->open(QIODevice::ReadOnly))
-				filePart.setBodyDevice(file);
-			file->setParent(multiPart);
-			parts.push_back(filePart);
-		}
-	}
+void Request::appendHttpParts(const QJsonDocument &document) const
+{
+    if (document.isObject() && this->multiPart.get()){
+        const auto values = document.object();
+        const auto keys = values.keys();
+        std::for_each(keys.begin(),keys.end(),[this,values](const QString& key){
+            QHttpPart textPart;
+            textPart.setHeader(QNetworkRequest::ContentDispositionHeader,this->contentDispositionValue(key));
+            textPart.setBody(values.value(key).toVariant().toByteArray());
+            this->multiPart->append(textPart);
+        });
+        const auto files = values.value("files").isNull() ? QJsonObject() : values.value("files").toObject();
+        this->appendHttpFilePart(files);
+    }
+}
+
+QString Request::getIdToken() const
+{
+    return this->idToken;
+}
+
+void Request::setIdToken(const QString &newIdToken)
+{
+    this->idToken = newIdToken;
 }
 
 const QList<QHttpPart> Request::buildRequestHttpParts(const QJsonDocument& document, QHttpMultiPart* multiPart) const {
@@ -264,10 +267,10 @@ const QList<QHttpPart> Request::buildRequestHttpParts(const QJsonDocument& docum
 	const auto filesObj = object.value("files").isNull() ? QJsonObject() : object.value("files").toObject();
 	if (!filesObj.isEmpty()) {
 		try {
-			this->appendHttpFilePart(parts, filesObj, multiPart);
+            //this->appendHttpFilePart(parts, filesObj, multiPart);
 		}
 		catch (const std::invalid_argument& err) {
-			qDebug(err.what());
+            qDebug() << err.what();
 			return QList<QHttpPart>();
 		}
 		object.remove("files");
@@ -277,7 +280,27 @@ const QList<QHttpPart> Request::buildRequestHttpParts(const QJsonDocument& docum
 	part.setHeader(QNetworkRequest::ContentDispositionHeader, rawBody);
 	part.setBody("DOCUMENT TEXT");
 	parts.push_back(part);
-	return parts;
+    return parts;
+}
+
+void Request::appendHttpFilePart(const QJsonObject &files) const
+{
+    if (files.isEmpty() || !this->multiPart.get()) { return; }
+    const auto keys = files.keys();
+    for (const auto& key : keys){
+        const QFileInfo fileInfo(files.value(key).toString());
+        if (!fileInfo.isFile())
+            throw std::invalid_argument("One of the files specified does not exist or has been deleted from location.");
+        QHttpPart filePart;
+        filePart.setHeader(QNetworkRequest::ContentTypeHeader, QMimeDatabase().mimeTypeForFile(fileInfo.absoluteFilePath()).name());
+        filePart.setHeader(QNetworkRequest::ContentDispositionHeader,this->contentDispositionValue(key));
+        auto * file = new QFile(fileInfo.absoluteFilePath());
+        if (!file->open(QIODevice::ReadOnly))
+            throw std::invalid_argument("Failed to open file specified. Please verify path exists");
+        filePart.setBodyDevice(file);
+        file->setParent(this->multiPart.get());
+        this->multiPart->append(filePart);
+    }
 }
 
 //slots
@@ -288,7 +311,8 @@ void Request::requestFinished(const QNetworkReply* reply) {
 }
 
 void Request::uploadProgressChanged(qint64 bytesReceived, qint64 bytesTotal) {
-
+    qDebug() << "BYTES SENT" << bytesReceived;
+    qDebug() << "BYTES TOTAL" << bytesTotal;
 }
 
 void Request::downloadProgessChanged(qint64 bytesReceived, qint64 bytesTotal) {

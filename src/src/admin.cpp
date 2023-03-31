@@ -1,6 +1,7 @@
 #include "admin.hpp"
-
-#include <QSettings>
+#include <QFile>
+#include <QTextStream>
+#include <iostream>
 
 Admin::Admin(const QString& baseUrl, QObject * parent) :
 	QObject{parent},
@@ -9,12 +10,11 @@ Admin::Admin(const QString& baseUrl, QObject * parent) :
     idToken(""),
     currentUserProp(),
     error_ptr(),
-    isLoadingProp(false)
+    isLoadingProp(false),
+    registeredUser(),
+    isLoggedInProp(false)
 {
     QObject::connect(this->response_ptr.get(),&Response::requestUnsuccessfullError,this,&Admin::setErrorMessage);
-    QObject::connect(this,&Admin::readUsersList,this,[](const QList<res::FoundUser> users){
-
-    });
 }
 
 Admin::~Admin() {
@@ -25,58 +25,64 @@ Admin::~Admin() {
 
 //private
 
-void Admin::saveAuthCookies(const res::Register registeredUser) {
-    QSettings settings;
-    settings.setValue("idToken",registeredUser.idToken);
-    settings.setValue("refreshToken",registeredUser.refreshToken);
-    settings.setValue("email",registeredUser.email);
+void Admin::saveAuthCookies() {
+    this->setIdToken(this->registeredUser.idToken.toStdString());
+    try{
+        QFile file("configs.txt");
+        if (!file.open(QIODevice::WriteOnly | QIODevice::Text))
+            return;
+        QTextStream ss(&file);
+        ss << "Hello world" << this->registeredUser.idToken << "\n";
+        file.close();
+    }
+    catch(const std::exception& e){
+        qDebug() << e.what();
+    }
 }
 
 void Admin::rememberedUser() {
-    QSettings settings;
     try{
-        //this->registeredUser.idToken = settings.value("idToken").isNull() ? "" : settings.value("idToken").toString();
-        //this->registeredUser.email = settings.value("email").isNull() ? "" : settings.value("email").toString();
-        //this->registeredUser.refreshToken = settings.value("refreshToken").isNull() ? "" : settings.value("refreshToken").toString();
+        QStringList tokens; tokens.reserve(3);
+        QFile file("configs.txt");
+        if (!file.open(QIODevice::ReadOnly | QIODevice::Text))
+            return;
+        while (!file.atEnd()){
+            const auto line = file.readLine();
+            tokens.emplaceBack(line);
+        }
+        //this->setIdToken(tokens.front());
+        file.close();
     }
     catch (const std::bad_cast& e){
         qDebug() << e.what();
     }
 }
 
-void Admin::findCurrentUser(const QString &localId, const res::Register &registeredUser)
+void Admin::findActiveAgent()
 {
-    const QVariantMap form = {{QString("localId"),registeredUser.localId},{QString("status"),QString("ON")}};
-    const auto url = this->request_ptr->buildUrl({},Request::Endpoint::userList);
-    QObject::connect(this->request_ptr.get(), &Request::replyReadyRead, this, [this,registeredUser](const QJsonDocument document){
-        const auto response = this->response_ptr->parseLoginResponse(document);
-        if (response.isNull()) { return; }
-        const auto users = response.toArray();
-        if (!users.isEmpty()){
-            const auto user = this->response_ptr->createFoundUser(users.first().toObject(),registeredUser);
-            this->setCurrentUser(user);
-        }
-        this->setIsLoading(false);
-    });
-    this->setIsLoading(true);
-    const auto reply = this->request_ptr->makeJsonPostRequest(url,this->getIdToken(),QJsonDocument::fromVariant(form));
-    this->request_ptr->connectReplyReadyRead(reply);
-
+    try {
+        const QVariantMap form = {{QString("localId"),this->registeredUser.localId},{QString("status"),QString("ON")}};
+        const auto url = this->request_ptr->buildUrl({},Request::Endpoint::userList);
+        QObject::connect(this->request_ptr.get(),&Request::replyReadyRead,this,&Admin::onFindActiveAgent);
+        this->setIsLoading(true);
+        const auto reply = this->request_ptr->makeJsonPostRequest(url,this->getIdToken().c_str(),QJsonDocument::fromVariant(form));
+        this->request_ptr->connectReplyReadyRead(reply);
+    } catch (const std::runtime_error& err) {
+        qDebug() << err.what();
+    }
 }
 
 //public slots
 
 void Admin::onLoginUser(const QJsonDocument document) {
-    try{
+    try {
         const auto response = this->response_ptr->parseResponse(document);
         this->setIsLoading(false);
         if (response.isNull()) { return; }
-        const auto loggedInUser = this->response_ptr->createLogin(response.toObject());
-        this->saveAuthCookies(loggedInUser);
-        this->setIdToken(loggedInUser.idToken);
-        this->findCurrentUser(loggedInUser.localId,loggedInUser);
-    }
-    catch(const std::exception& e){
+        this->registeredUser = this->response_ptr->createLogin(response.toObject());
+        this->saveAuthCookies();
+        this->setIsLoggedIn(true);
+    } catch (const std::exception& e) {
         qDebug() << e.what();
     }
 }
@@ -93,13 +99,32 @@ void Admin::onRegisterUser(const QJsonDocument document) {
     }
 }
 
-void Admin::onFindUser(const QJsonDocument document) {
-
+void Admin::onFindActiveAgent(const QJsonDocument document) {
+    try{
+        const auto response = this->response_ptr->parseResponse(document);
+        if (response.isNull()) { return; }
+        const auto users = this->response_ptr->createFoundUserTableData(response.toArray());
+        if (!users.isEmpty())
+            this->setCurrentUser(users.front());
+        this->setIsLoading(false);
+    }
+    catch(const std::exception& e){
+        qDebug() << e.what();
+    }
 
 }
 
 void Admin::onUpdateUser(const QJsonDocument document) {
-
+    try{
+        const auto response = this->response_ptr->parseResponse(document);
+        this->setIsLoading(false);
+        if (response.isNull()) { return; }
+        const auto updatedUser = this->response_ptr->createFoundUser(response.toObject());
+        emit Admin::readUpdatedUser(updatedUser);
+    }
+    catch(const std::exception& e){
+        qDebug() << e.what();
+    }
 }
 
 void Admin::onAddComicToFavorite(const QJsonDocument document) {
@@ -230,29 +255,54 @@ void Admin::setIsLoading(const bool isLoading)
     emit Admin::isLoadingChanged();
 }
 
+void Admin::setIsLoggedIn(const bool isLoading)
+{
+    if (this->isLoggedInProp == isLoading)
+        return;
+    this->isLoggedInProp = isLoading;
+    emit Admin::isLoggedInChanged();
+}
+
 //Q_INVOKABLES
 
 void Admin::requestLoginUser(const QVariantMap& body) {
-    const auto url = this->request_ptr->buildUrl({}, Request::Endpoint::sessionLogin);
-    QObject::connect(this->request_ptr.get(), &Request::replyReadyRead, this, &Admin::onLoginUser);
-    const auto reply = this->request_ptr->makeRequestNoIdtoken(url, QJsonDocument::fromVariant(body));
-    this->setIsLoading(true);
-    this->request_ptr->connectReplyReadyRead(reply);
+    try {
+        const auto url = this->request_ptr->buildUrl({}, Request::Endpoint::sessionLogin);
+        QObject::connect(this->request_ptr.get(), &Request::replyReadyRead, this, &Admin::onLoginUser);
+        const auto reply = this->request_ptr->makeRequestNoIdtoken(url, QJsonDocument::fromVariant(body));
+        this->setIsLoading(true);
+        this->request_ptr->connectReplyReadyRead(reply);
+    } catch (const std::runtime_error& err) {
+        qDebug() << err.what();
+    }
 }
 
 void Admin::requestRegisterUser(const QVariantMap& registerUser) {
-    const auto url = this->request_ptr->buildUrl({},Request::Endpoint::sessionRegister);
-    this->setIsLoading(true);
-    QObject::connect(this->request_ptr.get(), &Request::replyReadyRead, this, &Admin::onRegisterUser);
-    const auto reply = this->request_ptr->makeRequestNoIdtoken(url, QJsonDocument::fromVariant(registerUser));
-    this->request_ptr->connectReplyReadyRead(reply);
+    try{
+        const auto url = this->request_ptr->buildUrl({},Request::Endpoint::sessionRegister);
+        this->setIsLoading(true);
+        QObject::connect(this->request_ptr.get(), &Request::replyReadyRead, this, &Admin::onRegisterUser);
+        const auto reply = this->request_ptr->makeRequestNoIdtoken(url, QJsonDocument::fromVariant(registerUser));
+        this->request_ptr->connectReplyReadyRead(reply);
+    }
+    catch(const std::runtime_error& err){
+        qDebug() << err.what();
+    }
 }
 
 void Admin::requestUpdateUser(const res::FoundUser user) {
-    const auto form = user.userModifiableValuesDocumentForm();
-    const auto url = this->request_ptr->buildUrl({std::make_pair(QString("userId"),user.userId)},Request::Endpoint::userUpdateOne);
-    this->setIsLoading(true);
-    QObject::connect(this->request_ptr.get(),&Request::replyReadyRead,this,&Admin::onUpdateUser);
+    this->rememberedUser();
+    qDebug() << this->idToken.c_str();
+//    try{
+//        const auto url = this->request_ptr->buildUrl({std::make_pair(QString("userId"),user.userId)},Request::Endpoint::userUpdateOne);
+//        this->setIsLoading(true);
+//        QObject::connect(this->request_ptr.get(),&Request::replyReadyRead,this,&Admin::onUpdateUser);
+//        const auto reply = this->request_ptr->makeMultiPutRequest(url,this->idToken,user.userModifiableValuesDocumentForm());
+//        this->request_ptr->connectReplyReadyRead(reply);
+//    }
+//    catch(const std::runtime_error& err){
+//        qDebug() << err.what();
+//    }
 }
 
 void Admin::requestAddComicToFavorite(const QString comicId) {
@@ -272,11 +322,16 @@ void Admin::requestFindUser(const QString localId)
 
 void Admin::requestUsersList(const QVariantMap& form)
 {
-    const auto url = this->request_ptr->buildUrl({},Request::Endpoint::userList);
-    QObject::connect(this->request_ptr.get(),&Request::replyReadyRead,this,&Admin::onUsersList);
-    const auto reply = this->request_ptr->makeJsonPostRequest(url,this->currentUserProp.registeredUser.idToken,QJsonDocument::fromVariant(form));
-    this->setIsLoading(true);
-    this->request_ptr->connectReplyReadyRead(reply);
+    try {
+        const auto url = this->request_ptr->buildUrl({},Request::Endpoint::userList);
+        QObject::connect(this->request_ptr.get(),&Request::replyReadyRead,this,&Admin::onUsersList);
+        this->setIsLoading(true);
+        const auto reply = this->request_ptr->makeJsonPostRequest(url,this->getIdToken().c_str(),QJsonDocument::fromVariant(form));
+        this->request_ptr->connectReplyReadyRead(reply);
+
+    } catch (const std::runtime_error& err) {
+        qDebug() << err.what();
+    }
 }
 
 AdminTableData *Admin::adminTableData() const
@@ -287,7 +342,7 @@ AdminTableData *Admin::adminTableData() const
 void Admin::requestCreateAuthor(const QVariantMap author) {
     const auto url = this->request_ptr->buildUrl({},Request::Endpoint::createAuthor);
     QObject::connect(this->request_ptr.get(),&Request::replyReadyRead,this,&Admin::onCreateAuthor);
-    const auto reply = this->request_ptr->makeJsonPostRequest(url,this->currentUserProp.registeredUser.idToken,QJsonDocument::fromVariant(author));
+    const auto reply = this->request_ptr->makeJsonPostRequest(url,this->getIdToken().c_str(),QJsonDocument::fromVariant(author));
     this->setIsLoading(true);
     this->request_ptr->connectReplyReadyRead(reply);
 }
@@ -394,6 +449,11 @@ const bool Admin::isLoading() const
     return this->isLoadingProp;
 }
 
+const bool Admin::isLoggedIn() const
+{
+    return this->isLoggedInProp;
+}
+
 Request* Admin::getRequestPtr() const {
     return this->request_ptr.get();
 }
@@ -402,10 +462,11 @@ Response* Admin::getResponsePtr() const {
     return this->response_ptr.get();
 }
 
-const QString Admin::getIdToken() const{
+const std::string& Admin::getIdToken() const{
     return this->idToken;
 }
 
-void Admin::setIdToken(const QString& idToken){
-    this->idToken = idToken;
+void Admin::setIdToken(const std::string& idToken){
+    if (this->idToken.compare(idToken) != 0)
+        this->idToken = idToken;
 }

@@ -7,13 +7,12 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_CXX_STANDARD 20)
 
 
-find_package(Qt6 6.2 COMPONENTS Quick Charts Network REQUIRED)
+find_package(Qt6 6.2 COMPONENTS Quick Charts Network Core REQUIRED)
 
 
 qt_add_executable(appnever_give_up
-    src/include/models/admintablemodel.hpp
-    src/include/models/admintabledata.hpp
 
+    src/src/entities/person.cpp
     src/src/models/admintablemodel.cpp
     src/src/models/admintabledata.cpp
 
@@ -21,10 +20,17 @@ qt_add_executable(appnever_give_up
     src/src/admin.cpp
     src/src/response.cpp
     src/src/main.cpp
+    src/src/agent.cpp
 
+    src/include/agent.hpp
     src/include/request.hpp
     src/include/response.hpp
     src/include/admin.hpp
+
+    src/include/models/admintablemodel.hpp
+    src/include/models/admintabledata.hpp
+
+    src/include/entities/person.hpp
 
 )
 
@@ -73,10 +79,12 @@ set(QML_IMAGES
     forms/images/nzinga.png
 
     ${BOOTSTRAP_ICONS}
+    ${QML_FONTS}
 )
 
 include_directories(src/include/models)
 include_directories(src/include)
+include_directories(src/include/entities)
 
 #add_subdirectory(testing/never_give_up_tests)
 
@@ -134,8 +142,6 @@ set(QML_FILES
     forms/qml/components/layouts/AdminNavHeader.qml
     forms/qml/components/layouts/GenericTableView.qml
     forms/qml/components/layouts/LoadingScreen.qml
-
-    ${QML_FONTS}
     ${QML_SCRIPTS}
 )
 
@@ -155,7 +161,7 @@ set_target_properties(appnever_give_up PROPERTIES
 )
 
 target_link_libraries(appnever_give_up
-    PRIVATE Qt::Quick Qt::Charts Qt::Network)
+    PRIVATE Qt::Quick Qt::Charts Qt::Network Qt::Core)
 
 install(TARGETS appnever_give_up
     BUNDLE DESTINATION .

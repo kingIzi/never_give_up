@@ -1,0 +1,189 @@
+{
+    "classes": [
+        {
+            "className": "Agent",
+            "methods": [
+                {
+                    "access": "public",
+                    "name": "storeAgentAuth",
+                    "returnType": "void"
+                },
+                {
+                    "access": "public",
+                    "arguments": [
+                        {
+                            "name": "body",
+                            "type": "QVariantMap"
+                        }
+                    ],
+                    "name": "requestLogin",
+                    "returnType": "void"
+                },
+                {
+                    "access": "public",
+                    "arguments": [
+                        {
+                            "name": "body",
+                            "type": "QVariantMap"
+                        }
+                    ],
+                    "name": "requestUsersList",
+                    "returnType": "void"
+                },
+                {
+                    "access": "public",
+                    "arguments": [
+                        {
+                            "name": "userId",
+                            "type": "QString"
+                        },
+                        {
+                            "name": "user",
+                            "type": "res::FoundUser"
+                        }
+                    ],
+                    "name": "requestUserUpdate",
+                    "returnType": "void"
+                }
+            ],
+            "object": true,
+            "properties": [
+                {
+                    "constant": false,
+                    "designable": true,
+                    "final": false,
+                    "index": 0,
+                    "name": "isRequesting",
+                    "notify": "isRequestingChanged",
+                    "read": "isRequesting",
+                    "required": false,
+                    "scriptable": true,
+                    "stored": true,
+                    "type": "bool",
+                    "user": false,
+                    "write": "setIsRequesting"
+                },
+                {
+                    "constant": false,
+                    "designable": true,
+                    "final": false,
+                    "index": 1,
+                    "name": "isLoggedIn",
+                    "notify": "isLoggedInChanged",
+                    "read": "isLoggedIn",
+                    "required": false,
+                    "scriptable": true,
+                    "stored": true,
+                    "type": "bool",
+                    "user": false,
+                    "write": "setIsLoggedIn"
+                }
+            ],
+            "qualifiedClassName": "Agent",
+            "signals": [
+                {
+                    "access": "public",
+                    "arguments": [
+                        {
+                            "type": "QString"
+                        }
+                    ],
+                    "name": "requestFailedError",
+                    "returnType": "void"
+                },
+                {
+                    "access": "public",
+                    "name": "isRequestingChanged",
+                    "returnType": "void"
+                },
+                {
+                    "access": "public",
+                    "arguments": [
+                        {
+                            "type": "res::Error"
+                        }
+                    ],
+                    "name": "requestErrorMsg",
+                    "returnType": "void"
+                },
+                {
+                    "access": "public",
+                    "name": "isLoggedInChanged",
+                    "returnType": "void"
+                },
+                {
+                    "access": "public",
+                    "arguments": [
+                        {
+                            "type": "QList<res::FoundUser>"
+                        }
+                    ],
+                    "name": "usersList",
+                    "returnType": "void"
+                }
+            ],
+            "slots": [
+                {
+                    "access": "private",
+                    "arguments": [
+                        {
+                            "type": "QJsonDocument"
+                        }
+                    ],
+                    "name": "onRequestLogin",
+                    "returnType": "void"
+                },
+                {
+                    "access": "private",
+                    "arguments": [
+                        {
+                            "type": "QJsonDocument"
+                        }
+                    ],
+                    "name": "onRequestUsersList",
+                    "returnType": "void"
+                },
+                {
+                    "access": "private",
+                    "arguments": [
+                        {
+                            "type": "QJsonDocument"
+                        }
+                    ],
+                    "name": "onRequestUserUpdate",
+                    "returnType": "void"
+                },
+                {
+                    "access": "public",
+                    "arguments": [
+                        {
+                            "name": "arg",
+                            "type": "bool"
+                        }
+                    ],
+                    "name": "setIsRequesting",
+                    "returnType": "void"
+                },
+                {
+                    "access": "public",
+                    "arguments": [
+                        {
+                            "name": "arg",
+                            "type": "bool"
+                        }
+                    ],
+                    "name": "setIsLoggedIn",
+                    "returnType": "void"
+                }
+            ],
+            "superClasses": [
+                {
+                    "access": "public",
+                    "name": "QObject"
+                }
+            ]
+        }
+    ],
+    "inputFile": "agent.hpp",
+    "outputRevision": 68
+}

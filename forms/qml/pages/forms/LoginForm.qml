@@ -17,14 +17,9 @@ ColumnLayout{
         ResetPasswordForm{}
     }
     Connections{
-        target: _admin
-        function onErrorMessageChanged(error){
-            _emailTextField._textLabelError.text = _admin.errorMessage.message
-        }
-        function onCurrentUserChanged(){
-            if (_admin.currentUser.role === "ADMIN"){
-                _appLoader.state = "navigate"
-            }
+        target: _agent
+        function onRequestErrorMsg(error){
+            _emailTextField._textLabelError.text = error.message
         }
     }
 
@@ -83,7 +78,8 @@ ColumnLayout{
         onButtonClicked: {
             _emailTextField._textLabelError.text = ""
             const loginUser = Req.loginUser(_emailTextField._email,_passwordTextField._password)
-            _admin.requestLoginUser(loginUser)
+            _agent.requestLogin(loginUser)
+            //_admin.requestLoginUser(loginUser)
             //_appLoader.state ="navigate";
         }
     }

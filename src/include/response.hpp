@@ -105,7 +105,6 @@ namespace res{
         Q_PROPERTY(QDateTime dateUpdated MEMBER dateUpdated)
         Q_PROPERTY(QString status MEMBER status)
         Q_PROPERTY(QStringList favorites MEMBER favorites)
-        Q_PROPERTY(res::Register registeredUser MEMBER registeredUser)
 		QString userId;
 		QString email;
 		QString localId;
@@ -118,7 +117,6 @@ namespace res{
         QDateTime dateUpdated;
 		QString status;
 		QStringList favorites;
-        res::Register registeredUser;
         FoundUser() = default;
 		FoundUser(const QString& userId,const QString& email,const QString& localId,
 			const QString& telephone,const QString& fullName,const QString& photoFileName,
@@ -127,7 +125,7 @@ namespace res{
                   const res::Register& registeredUser) :
             userId(userId),email(email),localId(localId),phoneNumber(telephone),fullName(fullName),
 			photoFileName(photoFileName),photoUrl(photoUrl),role(role),dateCreated(dateCreated),
-            dateUpdated(dateUpdated),status(status),favorites(favorites),registeredUser(registeredUser)
+            dateUpdated(dateUpdated),status(status),favorites(favorites)
 		{}
         FoundUser(const QJsonObject& user,const res::Register& registeredUser) :
             userId(user.value("id").toString()),email(user.value("email").toString()),
@@ -136,7 +134,7 @@ namespace res{
             photoFileName(user.value("photoFileName").toString()),role(user.value("role").toString()),
             dateCreated(user.value("dateCreated").toVariant().toDateTime()),
             dateUpdated(user.value("dateUpdated").toVariant().toDateTime()),status(user.value("status").toString()),
-            favorites(user.value("favorites").toVariant().toStringList()),registeredUser(registeredUser)
+            favorites(user.value("favorites").toVariant().toStringList())
         {}
         FoundUser(const QJsonObject& user) :
             userId(user.value("id").toString()),email(user.value("email").toString()),
@@ -145,7 +143,7 @@ namespace res{
             photoFileName(user.value("photoFileName").toString()),role(user.value("role").toString()),
             dateCreated(user.value("dateCreated").toVariant().toDateTime()),
             dateUpdated(user.value("dateUpdated").toVariant().toDateTime()),status(user.value("status").toString()),
-            favorites(user.value("favorites").toVariant().toStringList()),registeredUser()
+            favorites(user.value("favorites").toVariant().toStringList())
         {}
         FoundUser& operator=(const res::FoundUser& user){
             this->userId = user.userId;
@@ -160,7 +158,6 @@ namespace res{
             this->favorites = user.favorites;
             this->status = user.status;
             this->role = user.role;
-            this->registeredUser = user.registeredUser;
             return (*this);
         }
         void updateData(const QVariantMap& map){
@@ -203,10 +200,8 @@ namespace res{
             const auto matchFavorites = this->favorites == user.favorites;
             const auto matchStatus = this->status.compare(user.status) == 0;
             const auto matchRole = this->role.compare(user.role) == 0;
-            const auto matchRegisteredUser = this->registeredUser == user.registeredUser;
             return matchUserId && matchEmail && matchLocalId && matchTelephone && matchFullName && matchPhotoFileName &&
-                    matchPhotoUrl && matchDateCreated && matchDateUpdated && matchFavorites && matchStatus && matchRole &&
-                    matchRegisteredUser;
+                    matchPhotoUrl && matchDateCreated && matchDateUpdated && matchFavorites && matchStatus && matchRole;
 
         }
         bool operator!=(const res::FoundUser& user) const{
@@ -225,10 +220,8 @@ namespace res{
             const auto matchFavorites = this->favorites != user.favorites;
             const auto matchStatus = this->status.compare(user.status) != 0;
             const auto matchRole = this->role.compare(user.role) != 0;
-            const auto matchRegisteredUser = this->registeredUser != user.registeredUser;
             return matchUserId && matchEmail && matchLocalId && matchTelephone && matchFullName && matchPhotoFileName &&
-                    matchPhotoUrl && matchDateCreated && matchDateUpdated && matchFavorites && matchStatus && matchRole &&
-                    matchRegisteredUser;
+                    matchPhotoUrl && matchDateCreated && matchDateUpdated && matchFavorites && matchStatus && matchRole;
 
         }
         const QList<QVariant> getFullNameAndEmailAndTelephoneAndRoleAndDateCreated() const{

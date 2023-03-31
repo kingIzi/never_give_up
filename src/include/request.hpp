@@ -28,11 +28,14 @@ private:
 	QString baseUrl;
     QString idToken;
 	std::unique_ptr<QNetworkAccessManager> manager;
+    std::unique_ptr<QHttpMultiPart> multiPart;
 	bool isOperating;
 	static const char* URL_FORMAT_REGEX;
 private:
 	const QList<QHttpPart> buildRequestHttpParts(const QJsonDocument& document, QHttpMultiPart* multiPart) const;
-	void appendHttpFilePart(QList<QHttpPart>& parts, const QJsonObject& filesObj, QHttpMultiPart* multiPart) const;
+    void appendHttpFilePart(const QJsonObject& files) const;
+    const QString contentDispositionValue(const QString key) const;
+    void appendHttpParts(const QJsonDocument& document) const;
 public:
 	struct Endpoint {
 		//session
@@ -81,7 +84,7 @@ public:
 
 	//Getters & Setters
 	void setManager(QNetworkAccessManager* manager);
-	QNetworkAccessManager* getManager() const;
+    QNetworkAccessManager* getManager();
 	void setBaseUrl(const QString& baseUrl);
 	const QString getBaseUrl() const;
 	void setIsOperating(const bool isOperating);
@@ -103,7 +106,11 @@ public:
 
 	//helper
 	const QUrl buildUrl(const QList<QPair<QString, QString>>& queries, const QString& path) const;
-	const QByteArray buildRawJsonFromDocument(const QJsonDocument& document) const;
+    const QByteArray buildRawJsonFromDocument(const QJsonDocument& document) const;
+    QString getIdToken() const;
+    void setIdToken(const QString &newIdToken);
+
+
 signals:
 	void response(const QJsonDocument);
     void replyReadyRead(const QJsonDocument);

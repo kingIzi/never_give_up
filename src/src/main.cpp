@@ -8,16 +8,18 @@
 
 #include "admintablemodel.hpp"
 #include "admin.hpp"
+#include "agent.hpp"
 
 int main(int argc, char *argv[])
 {
-    QApplication::setOrganizationName("Izi industries");
-    QApplication::setOrganizationDomain("http://localhost:8084");
-    QApplication::setApplicationName("Boyebi App");
     QApplication::setAttribute(Qt::AA_ShareOpenGLContexts);
+    QSettings::setDefaultFormat(QSettings::IniFormat); // personal preference
     //QtWebEngineQuick::initialize();
 
     QApplication app(argc, argv);
+    app.setOrganizationName("IziIndustries");
+    app.setOrganizationDomain("http://localhost:8084");
+    app.setApplicationName("BoyebiApp");
 
     QTranslator translator;
     const QStringList uiLanguages = QLocale::system().uiLanguages();
@@ -30,16 +32,19 @@ int main(int argc, char *argv[])
     }
 
     Admin admin("http://localhost:8084");
+    Agent agent;
     QQmlApplicationEngine engine;
     const QUrl url(u"qrc:/never_give_up/forms/qml/main.qml"_qs);
+    engine.rootContext()->setContextProperty("_agent",&agent);
+    engine.rootContext()->setContextProperty("_admin",&admin);
+
+    qmlRegisterType<AdminTableModel>("AdminTableModel",1,0,"AdminTableModel");
+    qmlRegisterSingletonType(QUrl("qrc:/never_give_up/forms/qml/Constants.qml"), "Constants", 1, 0, "Constants");
     QObject::connect(&engine, &QQmlApplicationEngine::objectCreated,
                      &app, [url](QObject *obj, const QUrl &objUrl) {
         if (!obj && url == objUrl)
             QCoreApplication::exit(-1);
     }, Qt::QueuedConnection);
-    engine.rootContext()->setContextProperty("_admin",&admin);
-    qmlRegisterType<AdminTableModel>("AdminTableModel",1,0,"AdminTableModel");
-    qmlRegisterSingletonType(QUrl("qrc:/never_give_up/forms/qml/Constants.qml"), "Constants", 1, 0, "Constants");
     engine.load(url);
 
     return app.exec();

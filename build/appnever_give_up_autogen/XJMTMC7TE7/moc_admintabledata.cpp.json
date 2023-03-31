@@ -1,0 +1,127 @@
+{
+    "classes": [
+        {
+            "className": "AdminTableData",
+            "methods": [
+                {
+                    "access": "public",
+                    "arguments": [
+                        {
+                            "name": "admins",
+                            "type": "QList<res::FoundUser>"
+                        }
+                    ],
+                    "name": "setAdmins",
+                    "returnType": "void"
+                }
+            ],
+            "object": true,
+            "qualifiedClassName": "AdminTableData",
+            "signals": [
+                {
+                    "access": "public",
+                    "name": "preItemAppended",
+                    "returnType": "void"
+                },
+                {
+                    "access": "public",
+                    "name": "postItemAppended",
+                    "returnType": "void"
+                },
+                {
+                    "access": "public",
+                    "arguments": [
+                        {
+                            "type": "QModelIndex"
+                        }
+                    ],
+                    "name": "preItemRemoved",
+                    "returnType": "void"
+                },
+                {
+                    "access": "public",
+                    "name": "postItemRemoved",
+                    "returnType": "void"
+                }
+            ],
+            "slots": [
+                {
+                    "access": "public",
+                    "arguments": [
+                        {
+                            "name": "admin",
+                            "type": "res::FoundUser"
+                        },
+                        {
+                            "name": "index",
+                            "type": "QModelIndex"
+                        }
+                    ],
+                    "name": "setItemAt",
+                    "returnType": "void"
+                },
+                {
+                    "access": "public",
+                    "arguments": [
+                        {
+                            "name": "admin",
+                            "type": "res::FoundUser"
+                        }
+                    ],
+                    "name": "setItemAt",
+                    "returnType": "void"
+                },
+                {
+                    "access": "public",
+                    "arguments": [
+                        {
+                            "name": "index",
+                            "type": "int"
+                        },
+                        {
+                            "name": "item",
+                            "type": "res::FoundUser"
+                        }
+                    ],
+                    "name": "setItemAt",
+                    "returnType": "void"
+                },
+                {
+                    "access": "public",
+                    "arguments": [
+                        {
+                            "name": "admin",
+                            "type": "res::FoundUser"
+                        }
+                    ],
+                    "name": "addItem",
+                    "returnType": "void"
+                },
+                {
+                    "access": "public",
+                    "arguments": [
+                        {
+                            "name": "index",
+                            "type": "QModelIndex"
+                        }
+                    ],
+                    "name": "removeItem",
+                    "returnType": "void"
+                },
+                {
+                    "access": "public",
+                    "name": "removeItem",
+                    "returnType": "void"
+                }
+            ],
+            "superClasses": [
+                {
+                    "access": "public",
+                    "name": "QObject"
+                }
+            ]
+        }
+    ],
+    "inputFile": "admintabledata.hpp",
+    "outputRevision": 68
+}

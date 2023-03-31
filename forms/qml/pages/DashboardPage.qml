@@ -8,75 +8,149 @@ import "../components/layouts"
 import "../../scripts/utilities.js" as Utils
 import "../../scripts/requests.js" as Req
 
-ScrollView{
-    id: _dashboardScroll
-    contentWidth: availableWidth
-    contentHeight: _dashboardContentItem.implicitHeight
-    Connections{
-        target: _admin
-        function onReadUsersList(users){
-            _defaultTableView._tableViewModel.populate(users)
-        }
+Page{
+    //id: _dashboardPage
+    width: Constants.width
+    height: Constants.height
+    background: Image{
+        source: Constants.images.loginBg
     }
-    Component.onCompleted: {
-        const users = Req.availableUsersList()
-        _admin.requestUsersList(users)
+    LoadingScreen{
+        id: _dashboardPage
     }
-
-    Item{
-        id: _dashboardContentItem
-        width: _dashboardScroll.contentWidth
-        implicitHeight: _dashboardCol.implicitHeight
-        anchors.fill: parent
-        ColumnLayout {
-            id: _dashboardCol
+    header: NavBar{
+        id: _navBar
+        anchors.top: parent.top
+        anchors.left: parent.left
+        anchors.right: parent.right
+        anchors.bottom: _dashboardScroll.top
+    }
+    contentItem: ScrollView{
+        id: _dashboardScroll
+        contentWidth: availableWidth
+        contentHeight: _dashboardContentItem.implicitHeight
+        Item{
+            id: _dashboardContentItem
+            width: _dashboardScroll.contentWidth
+            implicitHeight: _dashboardCol.implicitHeight
             anchors.fill: parent
-            spacing: 20
-            Item{
-                id: _detailsItem
-                Layout.fillWidth: true
-                Layout.preferredHeight: _dashboardDetailsGrid.implicitHeight
-                GridLayout{
-                    id: _dashboardDetailsGrid
-                    anchors.fill: parent
-                    columns: _root.width < 640 ? 1 : 2
-                    GeneralReview{
-                        id: _generalReviews
-                        Layout.fillWidth: true
-                        Layout.preferredHeight: 200
-                    }
-                    DashboardMostPopularAuthor{
-                        id: _dashBoardMostPopularAuthor
-                        Layout.fillWidth: true
-                        Layout.preferredHeight: 200
-                    }
-                }
-            }
-            Item{
-                id: _dataItem
-                Layout.fillWidth: true
-                Layout.preferredHeight: _dashboardDataGrid.implicitHeight
-                GridLayout{
-                    id: _dashboardDataGrid
-                    anchors.fill: parent
-                    columns: _root.width < 640 ? 1 : 2
-                    DefaultTableView{
-                        id: _defaultTableView
-                        Layout.fillWidth: true
-                        Layout.preferredHeight: implicitHeight
-                        _titleLabel.text: "Admins"
-                        Component.onCompleted: {
-                            const users = Req.availableUsersList();
-                            _admin.requestUsersList(users)
+            ColumnLayout {
+                id: _dashboardCol
+                anchors.fill: parent
+                spacing: 20
+                Item{
+                    id: _detailsItem
+                    Layout.fillWidth: true
+                    Layout.preferredHeight: _dashboardDetailsGrid.implicitHeight
+                    GridLayout{
+                        id: _dashboardDetailsGrid
+                        anchors.fill: parent
+                        columns: _root.width < 640 ? 1 : 2
+                        GeneralReview{
+                            id: _generalReviews
+                            Layout.fillWidth: true
+                            Layout.preferredHeight: 200
+                        }
+                        DashboardMostPopularAuthor{
+                            id: _dashBoardMostPopularAuthor
+                            Layout.fillWidth: true
+                            Layout.preferredHeight: 200
                         }
                     }
-                    DashboardCharts{
-                        id: _dashboardChart
-                        Layout.fillWidth: true
-                        Layout.preferredHeight: implicitHeight
+                }
+                Item{
+                    id: _dataItem
+                    Layout.fillWidth: true
+                    Layout.preferredHeight: _dashboardDataGrid.implicitHeight
+                    GridLayout{
+                        id: _dashboardDataGrid
+                        anchors.fill: parent
+                        columns: _root.width < 640 ? 1 : 2
+                        DefaultTableView{
+                            id: _defaultTableView
+                            Layout.fillWidth: true
+                            Layout.preferredHeight: implicitHeight
+                            _titleLabel.text: "Admins"
+                        }
+                        DashboardCharts{
+                            id: _dashboardChart
+                            Layout.fillWidth: true
+                            Layout.preferredHeight: implicitHeight
+                        }
                     }
                 }
             }
         }
     }
+
 }
+
+//ScrollView{
+//    id: _dashboardScroll
+//    contentWidth: availableWidth
+//    contentHeight: _dashboardContentItem.implicitHeight
+//    Connections{
+//        target: _admin
+//        function onReadUsersList(users){
+//            _defaultTableView._tableViewModel.populate(users)
+//        }
+//    }
+//    Component.onCompleted: {
+//        const users = Req.availableUsersList()
+//        //_admin.findActiveAgent()
+//        _admin.requestUsersList(users)
+//    }
+
+//    Item{
+//        id: _dashboardContentItem
+//        width: _dashboardScroll.contentWidth
+//        implicitHeight: _dashboardCol.implicitHeight
+//        anchors.fill: parent
+//        ColumnLayout {
+//            id: _dashboardCol
+//            anchors.fill: parent
+//            spacing: 20
+//            Item{
+//                id: _detailsItem
+//                Layout.fillWidth: true
+//                Layout.preferredHeight: _dashboardDetailsGrid.implicitHeight
+//                GridLayout{
+//                    id: _dashboardDetailsGrid
+//                    anchors.fill: parent
+//                    columns: _root.width < 640 ? 1 : 2
+//                    GeneralReview{
+//                        id: _generalReviews
+//                        Layout.fillWidth: true
+//                        Layout.preferredHeight: 200
+//                    }
+//                    DashboardMostPopularAuthor{
+//                        id: _dashBoardMostPopularAuthor
+//                        Layout.fillWidth: true
+//                        Layout.preferredHeight: 200
+//                    }
+//                }
+//            }
+//            Item{
+//                id: _dataItem
+//                Layout.fillWidth: true
+//                Layout.preferredHeight: _dashboardDataGrid.implicitHeight
+//                GridLayout{
+//                    id: _dashboardDataGrid
+//                    anchors.fill: parent
+//                    columns: _root.width < 640 ? 1 : 2
+//                    DefaultTableView{
+//                        id: _defaultTableView
+//                        Layout.fillWidth: true
+//                        Layout.preferredHeight: implicitHeight
+//                        _titleLabel.text: "Admins"
+//                    }
+//                    DashboardCharts{
+//                        id: _dashboardChart
+//                        Layout.fillWidth: true
+//                        Layout.preferredHeight: implicitHeight
+//                    }
+//                }
+//            }
+//        }
+//    }
+//}

@@ -27,6 +27,7 @@ public:
     void itemModified();
 public slots:
     void setItemAt(const res::FoundUser& admin,const QModelIndex & index = QModelIndex());
+    void setItemAt(const int index,const res::FoundUser& item);
     void addItem(const res::FoundUser& admin);
     void removeItem(const QModelIndex& index = QModelIndex());
 public:

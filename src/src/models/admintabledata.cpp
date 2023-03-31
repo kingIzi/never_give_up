@@ -40,6 +40,14 @@ void AdminTableData::setItemAt(const res::FoundUser &admin,const QModelIndex & i
     this->admins[index.row()] = admin;
 }
 
+void AdminTableData::setItemAt(const int index, const res::FoundUser &admin)
+{
+    if (index < 0 || index >= this->admins.size()) { return; }
+    const auto currAdmin = this->admins.at(index);
+    if (currAdmin == admin) { return; }
+    this->admins[index] = admin;
+}
+
 void AdminTableData::addItem(const res::FoundUser &admin)
 {
     emit AdminTableData::preItemAppended();

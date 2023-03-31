@@ -1,6 +1,8 @@
 #pragma once
 
 #include <QVariantMap>
+#include <QSettings>
+#include <string>
 #include "admintabledata.hpp"
 #include "response.hpp"
 
@@ -10,25 +12,28 @@ class Admin : public QObject {
     Q_PROPERTY(res::Error errorMessage READ errorMessage WRITE setErrorMessage NOTIFY errorMessageChanged)
     Q_PROPERTY(bool isLoading READ isLoading WRITE setIsLoading NOTIFY isLoadingChanged);
     Q_PROPERTY(AdminTableData* adminTableData READ adminTableData WRITE setAdminTableData NOTIFY adminTableDataChanged);
+    Q_PROPERTY(bool isLoggedIn READ isLoggedIn WRITE setIsLoggedIn NOTIFY isLoggedInChanged)
 private:
 	std::unique_ptr<Request> request_ptr;
 	std::unique_ptr<Response> response_ptr;
     AdminTableData* adminTableData_ptr;
     res::FoundUser currentUserProp;
     res::Error error_ptr;
-    QString idToken;
+    std::string idToken;
     bool isLoadingProp;
-
+    struct res::Login registeredUser;
+    bool isLoggedInProp;
+    QSettings settings;
 private:
-    void saveAuthCookies(const res::Register registeredUser); //save idToken
+    void saveAuthCookies(); //save idToken
     void rememberedUser();
-    void findCurrentUser(const QString& localId,const res::Register& registeredUser);
 signals:
     //properties
     void currentUserChanged();
     void errorMessageChanged();
     void isLoadingChanged();
     void adminTableDataChanged();
+    void isLoggedInChanged();
 
     //error dialogs
     void requestError(const res::Error);
@@ -42,7 +47,7 @@ signals:
 
 	//user
 	void readFindUser(res::FoundUser);
-	void readUpdateUser(res::FoundUser);
+    void readUpdatedUser(res::FoundUser);
 	void readAddComicToFavorite(res::FoundUser);
     void readUsersList(const QList<res::FoundUser>);
 
@@ -78,7 +83,7 @@ private slots:
     void onRegisterUser(const QJsonDocument document);
 	
 	//user
-	void onFindUser(const QJsonDocument document);
+    void onFindActiveAgent(const QJsonDocument document);
 	void onUpdateUser(const QJsonDocument document);
 	void onAddComicToFavorite(const QJsonDocument document);
     void onUsersList(const QJsonDocument);
@@ -117,6 +122,7 @@ public slots:
     void setCurrentUser(const res::FoundUser& user);
     void setErrorMessage(const res::Error& error);
     void setIsLoading(const bool isLoading);
+    void setIsLoggedIn(const bool isLoading);
 
 	//session resource
     void requestLoginUser(const QVariantMap& body);
@@ -162,14 +168,15 @@ public:
     const res::FoundUser currentUser() const;
     const res::Error& errorMessage() const;
     const bool isLoading() const;
+    const bool isLoggedIn() const;
     Q_INVOKABLE Request* getRequestPtr() const;
     Q_INVOKABLE Response* getResponsePtr() const;
-
+    Q_INVOKABLE void findActiveAgent();
     Q_INVOKABLE void requestUsersList(const QVariantMap&);
 
     //properties
     AdminTableData *adminTableData() const;
 
-    void setIdToken(const QString& idToken);
-    const QString getIdToken() const;
+    void setIdToken(const std::string& idToken);
+    const std::string& getIdToken() const;
 };

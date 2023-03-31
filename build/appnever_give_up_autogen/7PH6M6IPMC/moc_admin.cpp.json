@@ -1,0 +1,1132 @@
+{
+    "classes": [
+        {
+            "className": "Admin",
+            "methods": [
+                {
+                    "access": "public",
+                    "name": "getRequestPtr",
+                    "returnType": "Request*"
+                },
+                {
+                    "access": "public",
+                    "name": "getResponsePtr",
+                    "returnType": "Response*"
+                },
+                {
+                    "access": "public",
+                    "name": "findActiveAgent",
+                    "returnType": "void"
+                },
+                {
+                    "access": "public",
+                    "arguments": [
+                        {
+                            "type": "QVariantMap"
+                        }
+                    ],
+                    "name": "requestUsersList",
+                    "returnType": "void"
+                }
+            ],
+            "object": true,
+            "properties": [
+                {
+                    "constant": false,
+                    "designable": true,
+                    "final": false,
+                    "index": 0,
+                    "name": "currentUser",
+                    "notify": "currentUserChanged",
+                    "read": "currentUser",
+                    "required": false,
+                    "scriptable": true,
+                    "stored": true,
+                    "type": "res::FoundUser",
+                    "user": false,
+                    "write": "setCurrentUser"
+                },
+                {
+                    "constant": false,
+                    "designable": true,
+                    "final": false,
+                    "index": 1,
+                    "name": "errorMessage",
+                    "notify": "errorMessageChanged",
+                    "read": "errorMessage",
+                    "required": false,
+                    "scriptable": true,
+                    "stored": true,
+                    "type": "res::Error",
+                    "user": false,
+                    "write": "setErrorMessage"
+                },
+                {
+                    "constant": false,
+                    "designable": true,
+                    "final": false,
+                    "index": 2,
+                    "name": "isLoading",
+                    "notify": "isLoadingChanged",
+                    "read": "isLoading",
+                    "required": false,
+                    "scriptable": true,
+                    "stored": true,
+                    "type": "bool",
+                    "user": false,
+                    "write": "setIsLoading"
+                },
+                {
+                    "constant": false,
+                    "designable": true,
+                    "final": false,
+                    "index": 3,
+                    "name": "adminTableData",
+                    "notify": "adminTableDataChanged",
+                    "read": "adminTableData",
+                    "required": false,
+                    "scriptable": true,
+                    "stored": true,
+                    "type": "AdminTableData*",
+                    "user": false,
+                    "write": "setAdminTableData"
+                },
+                {
+                    "constant": false,
+                    "designable": true,
+                    "final": false,
+                    "index": 4,
+                    "name": "isLoggedIn",
+                    "notify": "isLoggedInChanged",
+                    "read": "isLoggedIn",
+                    "required": false,
+                    "scriptable": true,
+                    "stored": true,
+                    "type": "bool",
+                    "user": false,
+                    "write": "setIsLoggedIn"
+                }
+            ],
+            "qualifiedClassName": "Admin",
+            "signals": [
+                {
+                    "access": "public",
+                    "name": "currentUserChanged",
+                    "returnType": "void"
+                },
+                {
+                    "access": "public",
+                    "name": "errorMessageChanged",
+                    "returnType": "void"
+                },
+                {
+                    "access": "public",
+                    "name": "isLoadingChanged",
+                    "returnType": "void"
+                },
+                {
+                    "access": "public",
+                    "name": "adminTableDataChanged",
+                    "returnType": "void"
+                },
+                {
+                    "access": "public",
+                    "name": "isLoggedInChanged",
+                    "returnType": "void"
+                },
+                {
+                    "access": "public",
+                    "arguments": [
+                        {
+                            "type": "res::Error"
+                        }
+                    ],
+                    "name": "requestError",
+                    "returnType": "void"
+                },
+                {
+                    "access": "public",
+                    "name": "registeredSuccessfully",
+                    "returnType": "void"
+                },
+                {
+                    "access": "public",
+                    "arguments": [
+                        {
+                            "type": "res::Error"
+                        }
+                    ],
+                    "name": "readLoginResponseError",
+                    "returnType": "void"
+                },
+                {
+                    "access": "public",
+                    "arguments": [
+                        {
+                            "type": "res::Login"
+                        }
+                    ],
+                    "name": "readLoginResponse",
+                    "returnType": "void"
+                },
+                {
+                    "access": "public",
+                    "arguments": [
+                        {
+                            "type": "res::Error"
+                        }
+                    ],
+                    "name": "readRegisterResponseError",
+                    "returnType": "void"
+                },
+                {
+                    "access": "public",
+                    "arguments": [
+                        {
+                            "type": "res::Register"
+                        }
+                    ],
+                    "name": "readRegisterResponse",
+                    "returnType": "void"
+                },
+                {
+                    "access": "public",
+                    "arguments": [
+                        {
+                            "type": "res::FoundUser"
+                        }
+                    ],
+                    "name": "readFindUser",
+                    "returnType": "void"
+                },
+                {
+                    "access": "public",
+                    "arguments": [
+                        {
+                            "type": "res::FoundUser"
+                        }
+                    ],
+                    "name": "readUpdatedUser",
+                    "returnType": "void"
+                },
+                {
+                    "access": "public",
+                    "arguments": [
+                        {
+                            "type": "res::FoundUser"
+                        }
+                    ],
+                    "name": "readAddComicToFavorite",
+                    "returnType": "void"
+                },
+                {
+                    "access": "public",
+                    "arguments": [
+                        {
+                            "type": "QList<res::FoundUser>"
+                        }
+                    ],
+                    "name": "readUsersList",
+                    "returnType": "void"
+                },
+                {
+                    "access": "public",
+                    "arguments": [
+                        {
+                            "type": "res::Author"
+                        }
+                    ],
+                    "name": "readCreateAuthor",
+                    "returnType": "void"
+                },
+                {
+                    "access": "public",
+                    "arguments": [
+                        {
+                            "type": "res::Author"
+                        }
+                    ],
+                    "name": "readUpdateAuthor",
+                    "returnType": "void"
+                },
+                {
+                    "access": "public",
+                    "arguments": [
+                        {
+                            "type": "res::Author"
+                        }
+                    ],
+                    "name": "readDeleteAuthor",
+                    "returnType": "void"
+                },
+                {
+                    "access": "public",
+                    "arguments": [
+                        {
+                            "type": "res::Author"
+                        }
+                    ],
+                    "name": "readFindAuthor",
+                    "returnType": "void"
+                },
+                {
+                    "access": "public",
+                    "arguments": [
+                        {
+                            "type": "QList<res::Author>"
+                        }
+                    ],
+                    "name": "readAuthorList",
+                    "returnType": "void"
+                },
+                {
+                    "access": "public",
+                    "arguments": [
+                        {
+                            "type": "res::Category"
+                        }
+                    ],
+                    "name": "readCreateCategory",
+                    "returnType": "void"
+                },
+                {
+                    "access": "public",
+                    "arguments": [
+                        {
+                            "type": "res::Category"
+                        }
+                    ],
+                    "name": "readUpdateCategory",
+                    "returnType": "void"
+                },
+                {
+                    "access": "public",
+                    "arguments": [
+                        {
+                            "type": "res::Category"
+                        }
+                    ],
+                    "name": "readFindCategory",
+                    "returnType": "void"
+                },
+                {
+                    "access": "public",
+                    "arguments": [
+                        {
+                            "type": "res::Category"
+                        }
+                    ],
+                    "name": "readRemoveCategory",
+                    "returnType": "void"
+                },
+                {
+                    "access": "public",
+                    "arguments": [
+                        {
+                            "type": "QList<res::Category>"
+                        }
+                    ],
+                    "name": "readCategoryList",
+                    "returnType": "void"
+                },
+                {
+                    "access": "public",
+                    "arguments": [
+                        {
+                            "type": "res::Comic"
+                        }
+                    ],
+                    "name": "readCreateComic",
+                    "returnType": "void"
+                },
+                {
+                    "access": "public",
+                    "arguments": [
+                        {
+                            "type": "res::Comic"
+                        }
+                    ],
+                    "name": "readUpdateComic",
+                    "returnType": "void"
+                },
+                {
+                    "access": "public",
+                    "arguments": [
+                        {
+                            "type": "QList<res::Comic>"
+                        }
+                    ],
+                    "name": "readComicList",
+                    "returnType": "void"
+                },
+                {
+                    "access": "public",
+                    "arguments": [
+                        {
+                            "type": "res::Comic"
+                        }
+                    ],
+                    "name": "readRemoveComic",
+                    "returnType": "void"
+                },
+                {
+                    "access": "public",
+                    "arguments": [
+                        {
+                            "type": "res::Comic"
+                        }
+                    ],
+                    "name": "readFindComic",
+                    "returnType": "void"
+                },
+                {
+                    "access": "public",
+                    "arguments": [
+                        {
+                            "type": "res::Comic"
+                        }
+                    ],
+                    "name": "readLikeComic",
+                    "returnType": "void"
+                },
+                {
+                    "access": "public",
+                    "arguments": [
+                        {
+                            "type": "res::Comic"
+                        }
+                    ],
+                    "name": "readViewComic",
+                    "returnType": "void"
+                },
+                {
+                    "access": "public",
+                    "arguments": [
+                        {
+                            "type": "res::Comic"
+                        }
+                    ],
+                    "name": "readFindComment",
+                    "returnType": "void"
+                },
+                {
+                    "access": "public",
+                    "arguments": [
+                        {
+                            "type": "res::Comic"
+                        }
+                    ],
+                    "name": "readReplyComment",
+                    "returnType": "void"
+                },
+                {
+                    "access": "public",
+                    "arguments": [
+                        {
+                            "type": "res::Comic"
+                        }
+                    ],
+                    "name": "readLikeComment",
+                    "returnType": "void"
+                },
+                {
+                    "access": "public",
+                    "arguments": [
+                        {
+                            "type": "res::Comic"
+                        }
+                    ],
+                    "name": "readRemoveComment",
+                    "returnType": "void"
+                }
+            ],
+            "slots": [
+                {
+                    "access": "private",
+                    "arguments": [
+                        {
+                            "name": "document",
+                            "type": "QJsonDocument"
+                        }
+                    ],
+                    "name": "onLoginUser",
+                    "returnType": "void"
+                },
+                {
+                    "access": "private",
+                    "arguments": [
+                        {
+                            "name": "document",
+                            "type": "QJsonDocument"
+                        }
+                    ],
+                    "name": "onRegisterUser",
+                    "returnType": "void"
+                },
+                {
+                    "access": "private",
+                    "arguments": [
+                        {
+                            "name": "document",
+                            "type": "QJsonDocument"
+                        }
+                    ],
+                    "name": "onFindActiveAgent",
+                    "returnType": "void"
+                },
+                {
+                    "access": "private",
+                    "arguments": [
+                        {
+                            "name": "document",
+                            "type": "QJsonDocument"
+                        }
+                    ],
+                    "name": "onUpdateUser",
+                    "returnType": "void"
+                },
+                {
+                    "access": "private",
+                    "arguments": [
+                        {
+                            "name": "document",
+                            "type": "QJsonDocument"
+                        }
+                    ],
+                    "name": "onAddComicToFavorite",
+                    "returnType": "void"
+                },
+                {
+                    "access": "private",
+                    "arguments": [
+                        {
+                            "type": "QJsonDocument"
+                        }
+                    ],
+                    "name": "onUsersList",
+                    "returnType": "void"
+                },
+                {
+                    "access": "private",
+                    "arguments": [
+                        {
+                            "name": "document",
+                            "type": "QJsonDocument"
+                        }
+                    ],
+                    "name": "onCreateAuthor",
+                    "returnType": "void"
+                },
+                {
+                    "access": "private",
+                    "arguments": [
+                        {
+                            "name": "document",
+                            "type": "QJsonDocument"
+                        }
+                    ],
+                    "name": "onUpdateAuthor",
+                    "returnType": "void"
+                },
+                {
+                    "access": "private",
+                    "arguments": [
+                        {
+                            "name": "document",
+                            "type": "QJsonDocument"
+                        }
+                    ],
+                    "name": "onDeleteAuthor",
+                    "returnType": "void"
+                },
+                {
+                    "access": "private",
+                    "arguments": [
+                        {
+                            "name": "document",
+                            "type": "QJsonDocument"
+                        }
+                    ],
+                    "name": "onFindAuthor",
+                    "returnType": "void"
+                },
+                {
+                    "access": "private",
+                    "arguments": [
+                        {
+                            "name": "document",
+                            "type": "QJsonDocument"
+                        }
+                    ],
+                    "name": "onAuthorList",
+                    "returnType": "void"
+                },
+                {
+                    "access": "private",
+                    "arguments": [
+                        {
+                            "name": "document",
+                            "type": "QJsonDocument"
+                        }
+                    ],
+                    "name": "onCreateCategory",
+                    "returnType": "void"
+                },
+                {
+                    "access": "private",
+                    "arguments": [
+                        {
+                            "name": "document",
+                            "type": "QJsonDocument"
+                        }
+                    ],
+                    "name": "onUpdateCategory",
+                    "returnType": "void"
+                },
+                {
+                    "access": "private",
+                    "arguments": [
+                        {
+                            "name": "document",
+                            "type": "QJsonDocument"
+                        }
+                    ],
+                    "name": "onFindCategory",
+                    "returnType": "void"
+                },
+                {
+                    "access": "private",
+                    "arguments": [
+                        {
+                            "name": "document",
+                            "type": "QJsonDocument"
+                        }
+                    ],
+                    "name": "onRemoveCategory",
+                    "returnType": "void"
+                },
+                {
+                    "access": "private",
+                    "arguments": [
+                        {
+                            "name": "document",
+                            "type": "QJsonDocument"
+                        }
+                    ],
+                    "name": "onCategoryList",
+                    "returnType": "void"
+                },
+                {
+                    "access": "private",
+                    "arguments": [
+                        {
+                            "name": "document",
+                            "type": "QJsonDocument"
+                        }
+                    ],
+                    "name": "onCreateComic",
+                    "returnType": "void"
+                },
+                {
+                    "access": "private",
+                    "arguments": [
+                        {
+                            "name": "document",
+                            "type": "QJsonDocument"
+                        }
+                    ],
+                    "name": "onUpdateComic",
+                    "returnType": "void"
+                },
+                {
+                    "access": "private",
+                    "arguments": [
+                        {
+                            "name": "document",
+                            "type": "QJsonDocument"
+                        }
+                    ],
+                    "name": "onComicList",
+                    "returnType": "void"
+                },
+                {
+                    "access": "private",
+                    "arguments": [
+                        {
+                            "name": "document",
+                            "type": "QJsonDocument"
+                        }
+                    ],
+                    "name": "onRemoveComic",
+                    "returnType": "void"
+                },
+                {
+                    "access": "private",
+                    "arguments": [
+                        {
+                            "name": "document",
+                            "type": "QJsonDocument"
+                        }
+                    ],
+                    "name": "onFindComic",
+                    "returnType": "void"
+                },
+                {
+                    "access": "private",
+                    "arguments": [
+                        {
+                            "name": "document",
+                            "type": "QJsonDocument"
+                        }
+                    ],
+                    "name": "onLikeComic",
+                    "returnType": "void"
+                },
+                {
+                    "access": "private",
+                    "arguments": [
+                        {
+                            "name": "document",
+                            "type": "QJsonDocument"
+                        }
+                    ],
+                    "name": "onViewComic",
+                    "returnType": "void"
+                },
+                {
+                    "access": "private",
+                    "arguments": [
+                        {
+                            "name": "document",
+                            "type": "QJsonDocument"
+                        }
+                    ],
+                    "name": "onFindComment",
+                    "returnType": "void"
+                },
+                {
+                    "access": "private",
+                    "arguments": [
+                        {
+                            "name": "document",
+                            "type": "QJsonDocument"
+                        }
+                    ],
+                    "name": "onReplyComment",
+                    "returnType": "void"
+                },
+                {
+                    "access": "private",
+                    "arguments": [
+                        {
+                            "name": "document",
+                            "type": "QJsonDocument"
+                        }
+                    ],
+                    "name": "onLikeComment",
+                    "returnType": "void"
+                },
+                {
+                    "access": "private",
+                    "arguments": [
+                        {
+                            "name": "document",
+                            "type": "QJsonDocument"
+                        }
+                    ],
+                    "name": "onRemoveComment",
+                    "returnType": "void"
+                },
+                {
+                    "access": "public",
+                    "arguments": [
+                        {
+                            "name": "adminTableData",
+                            "type": "AdminTableData*"
+                        }
+                    ],
+                    "name": "setAdminTableData",
+                    "returnType": "void"
+                },
+                {
+                    "access": "public",
+                    "arguments": [
+                        {
+                            "name": "user",
+                            "type": "res::FoundUser"
+                        }
+                    ],
+                    "name": "setCurrentUser",
+                    "returnType": "void"
+                },
+                {
+                    "access": "public",
+                    "arguments": [
+                        {
+                            "name": "error",
+                            "type": "res::Error"
+                        }
+                    ],
+                    "name": "setErrorMessage",
+                    "returnType": "void"
+                },
+                {
+                    "access": "public",
+                    "arguments": [
+                        {
+                            "name": "isLoading",
+                            "type": "bool"
+                        }
+                    ],
+                    "name": "setIsLoading",
+                    "returnType": "void"
+                },
+                {
+                    "access": "public",
+                    "arguments": [
+                        {
+                            "name": "isLoading",
+                            "type": "bool"
+                        }
+                    ],
+                    "name": "setIsLoggedIn",
+                    "returnType": "void"
+                },
+                {
+                    "access": "public",
+                    "arguments": [
+                        {
+                            "name": "body",
+                            "type": "QVariantMap"
+                        }
+                    ],
+                    "name": "requestLoginUser",
+                    "returnType": "void"
+                },
+                {
+                    "access": "public",
+                    "arguments": [
+                        {
+                            "name": "registerUser",
+                            "type": "QVariantMap"
+                        }
+                    ],
+                    "name": "requestRegisterUser",
+                    "returnType": "void"
+                },
+                {
+                    "access": "public",
+                    "arguments": [
+                        {
+                            "name": "profile",
+                            "type": "res::FoundUser"
+                        }
+                    ],
+                    "name": "requestUpdateUser",
+                    "returnType": "void"
+                },
+                {
+                    "access": "public",
+                    "arguments": [
+                        {
+                            "name": "comicId",
+                            "type": "QString"
+                        }
+                    ],
+                    "name": "requestAddComicToFavorite",
+                    "returnType": "void"
+                },
+                {
+                    "access": "public",
+                    "arguments": [
+                        {
+                            "name": "localId",
+                            "type": "QString"
+                        }
+                    ],
+                    "name": "requestFindUser",
+                    "returnType": "void"
+                },
+                {
+                    "access": "public",
+                    "arguments": [
+                        {
+                            "name": "author",
+                            "type": "QVariantMap"
+                        }
+                    ],
+                    "name": "requestCreateAuthor",
+                    "returnType": "void"
+                },
+                {
+                    "access": "public",
+                    "arguments": [
+                        {
+                            "name": "authorId",
+                            "type": "QString"
+                        },
+                        {
+                            "name": "author",
+                            "type": "QVariantMap"
+                        }
+                    ],
+                    "name": "requestUpdateAuthor",
+                    "returnType": "void"
+                },
+                {
+                    "access": "public",
+                    "arguments": [
+                        {
+                            "name": "authorId",
+                            "type": "QString"
+                        }
+                    ],
+                    "name": "requestDeleteAuthor",
+                    "returnType": "void"
+                },
+                {
+                    "access": "public",
+                    "arguments": [
+                        {
+                            "name": "authorId",
+                            "type": "QString"
+                        }
+                    ],
+                    "name": "requestFindAuthor",
+                    "returnType": "void"
+                },
+                {
+                    "access": "public",
+                    "arguments": [
+                        {
+                            "name": "limit",
+                            "type": "int"
+                        },
+                        {
+                            "name": "options",
+                            "type": "QVariantMap"
+                        }
+                    ],
+                    "name": "requestAuthorList",
+                    "returnType": "void"
+                },
+                {
+                    "access": "public",
+                    "arguments": [
+                        {
+                            "name": "category",
+                            "type": "QVariantMap"
+                        }
+                    ],
+                    "name": "requestCreateCategory",
+                    "returnType": "void"
+                },
+                {
+                    "access": "public",
+                    "arguments": [
+                        {
+                            "name": "categoryId",
+                            "type": "QString"
+                        },
+                        {
+                            "name": "category",
+                            "type": "QVariantMap"
+                        }
+                    ],
+                    "name": "requestUpdateCategory",
+                    "returnType": "void"
+                },
+                {
+                    "access": "public",
+                    "arguments": [
+                        {
+                            "name": "categoryId",
+                            "type": "QString"
+                        }
+                    ],
+                    "name": "requestFindCategory",
+                    "returnType": "void"
+                },
+                {
+                    "access": "public",
+                    "arguments": [
+                        {
+                            "name": "categoryId",
+                            "type": "QString"
+                        }
+                    ],
+                    "name": "requestRemoveCategory",
+                    "returnType": "void"
+                },
+                {
+                    "access": "public",
+                    "arguments": [
+                        {
+                            "name": "limit",
+                            "type": "int"
+                        },
+                        {
+                            "name": "options",
+                            "type": "QVariantMap"
+                        }
+                    ],
+                    "name": "requestCategoryList",
+                    "returnType": "void"
+                },
+                {
+                    "access": "public",
+                    "arguments": [
+                        {
+                            "name": "comic",
+                            "type": "QVariantMap"
+                        }
+                    ],
+                    "name": "requestCreateComic",
+                    "returnType": "void"
+                },
+                {
+                    "access": "public",
+                    "arguments": [
+                        {
+                            "name": "comicId",
+                            "type": "QString"
+                        },
+                        {
+                            "name": "comic",
+                            "type": "QVariantMap"
+                        }
+                    ],
+                    "name": "requestUpdateComic",
+                    "returnType": "void"
+                },
+                {
+                    "access": "public",
+                    "arguments": [
+                        {
+                            "name": "limit",
+                            "type": "int"
+                        },
+                        {
+                            "name": "option",
+                            "type": "QVariantMap"
+                        }
+                    ],
+                    "name": "requestComicList",
+                    "returnType": "void"
+                },
+                {
+                    "access": "public",
+                    "arguments": [
+                        {
+                            "name": "comicId",
+                            "type": "QString"
+                        }
+                    ],
+                    "name": "requestRemoveComic",
+                    "returnType": "void"
+                },
+                {
+                    "access": "public",
+                    "arguments": [
+                        {
+                            "name": "comicId",
+                            "type": "QString"
+                        }
+                    ],
+                    "name": "requestFindComic",
+                    "returnType": "void"
+                },
+                {
+                    "access": "public",
+                    "arguments": [
+                        {
+                            "name": "comicId",
+                            "type": "QString"
+                        }
+                    ],
+                    "name": "requestLikeComic",
+                    "returnType": "void"
+                },
+                {
+                    "access": "public",
+                    "arguments": [
+                        {
+                            "name": "comicId",
+                            "type": "QString"
+                        }
+                    ],
+                    "name": "requestViewComic",
+                    "returnType": "void"
+                },
+                {
+                    "access": "public",
+                    "arguments": [
+                        {
+                            "name": "comicId",
+                            "type": "QString"
+                        },
+                        {
+                            "name": "comment",
+                            "type": "QVariantMap"
+                        }
+                    ],
+                    "name": "requestFindComment",
+                    "returnType": "void"
+                },
+                {
+                    "access": "public",
+                    "arguments": [
+                        {
+                            "name": "comicId",
+                            "type": "QString"
+                        },
+                        {
+                            "name": "comment",
+                            "type": "QVariantMap"
+                        }
+                    ],
+                    "name": "requestReplyComment",
+                    "returnType": "void"
+                },
+                {
+                    "access": "public",
+                    "arguments": [
+                        {
+                            "name": "comicId",
+                            "type": "QString"
+                        },
+                        {
+                            "name": "comment",
+                            "type": "QVariantMap"
+                        }
+                    ],
+                    "name": "requestLikeComment",
+                    "returnType": "void"
+                },
+                {
+                    "access": "public",
+                    "arguments": [
+                        {
+                            "name": "comicId",
+                            "type": "QString"
+                        },
+                        {
+                            "name": "comment",
+                            "type": "QVariantMap"
+                        }
+                    ],
+                    "name": "requestRemoveComment",
+                    "returnType": "void"
+                }
+            ],
+            "superClasses": [
+                {
+                    "access": "public",
+                    "name": "QObject"
+                }
+            ]
+        }
+    ],
+    "inputFile": "admin.hpp",
+    "outputRevision": 68
+}

@@ -1,6 +1,7 @@
 #include "admintablemodel.hpp"
 
 #include <QModelIndex>
+#include <QQmlApplicationEngine>
 
 void AdminTableModel::populationSignals()
 {
@@ -28,6 +29,7 @@ AdminTableModel::AdminTableModel(QAbstractTableModel *parent)
       adminTableData_ptr(nullptr)
 {
     QObject::connect(this,&AdminTableModel::populate,this,&AdminTableModel::onPopulate);
+    QObject::connect(this,&AdminTableModel::updatedItem,this,&AdminTableModel::onUpdatedItem);
 }
 
 int AdminTableModel::rowCount(const QModelIndex &) const
@@ -135,7 +137,12 @@ void AdminTableModel::setItemAt(const QModelIndex& index,const QString data)
     this->adminTableData_ptr->itemModified();
     this->populationSignals();
     this->endResetModel();
-    emit AdminTableModel::itemChanged(this->adminTableData_ptr->getAdmins().at(index.row()));
+    //emit AdminTableModel::itemChanged(this->adminTableData_ptr->getAdmins().at(index.row()));
+}
+
+res::FoundUser AdminTableModel::findItemAt(const QModelIndex& index) const
+{
+    return this->adminTableData_ptr->getAdmins().at(index.row());
 }
 
 void AdminTableModel::onPopulate(const QList<res::FoundUser> users)
@@ -152,6 +159,21 @@ void AdminTableModel::onPopulate(const QList<res::FoundUser> users)
     this->populationSignals();
     this->endResetModel();
 
+}
+
+void AdminTableModel::onUpdatedItem(const res::FoundUser item)
+{
+    qDebug() << this->adminTableData_ptr->getAdmins().size();
+    const auto it = std::find_if(std::begin(this->adminTableData_ptr->getAdmins()),std::end(this->adminTableData_ptr->getAdmins()),[item](const res::FoundUser& value){
+        return item.userId.compare(value.userId) == 0;
+    });
+    if (it != std::end(this->adminTableData_ptr->getAdmins())){
+        qDebug() << "ITEM FOUND";
+        this->beginResetModel();
+        this->adminTableData_ptr->setItemAt(std::distance(it,this->adminTableData_ptr->getAdmins().end()),item);
+        this->populationSignals();
+        this->endResetModel();
+    }
 }
 
 void AdminTableModel::setHeaders(const QStringList &headers)

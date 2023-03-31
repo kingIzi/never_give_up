@@ -1,0 +1,131 @@
+{
+	"folders":
+	[
+		{
+			"path": "../"
+		}
+	],
+	"build_systems":
+	[
+		{
+			"name": "never_give_up - all",
+			"cmd": ["C:/Qt/Tools/mingw1120_64/bin/mingw32-make.exe", "-f", "Makefile", "all"],
+			"working_dir": "${project_path}",
+			"file_regex": "^(..[^:]*)(?::|\\()([0-9]+)(?::|\\))(?:([0-9]+):)?\\s*(.*)"
+		},
+		{
+			"name": "never_give_up - clean",
+			"cmd": ["C:/Qt/Tools/mingw1120_64/bin/mingw32-make.exe", "-f", "Makefile", "clean"],
+			"working_dir": "${project_path}",
+			"file_regex": "^(..[^:]*)(?::|\\()([0-9]+)(?::|\\))(?:([0-9]+):)?\\s*(.*)"
+		},
+		{
+			"name": "never_give_up - appnever_give_up",
+			"cmd": ["C:/Qt/Tools/mingw1120_64/bin/mingw32-make.exe", "-f", "Makefile", "appnever_give_up"],
+			"working_dir": "${project_path}",
+			"file_regex": "^(..[^:]*)(?::|\\()([0-9]+)(?::|\\))(?:([0-9]+):)?\\s*(.*)"
+		},
+		{
+			"name": "never_give_up - appnever_give_up/fast",
+			"cmd": ["C:/Qt/Tools/mingw1120_64/bin/mingw32-make.exe", "-f", "Makefile", "appnever_give_up/fast"],
+			"working_dir": "${project_path}",
+			"file_regex": "^(..[^:]*)(?::|\\()([0-9]+)(?::|\\))(?:([0-9]+):)?\\s*(.*)"
+		},
+		{
+			"name": "never_give_up - appnever_give_up_automoc_json_extraction",
+			"cmd": ["C:/Qt/Tools/mingw1120_64/bin/mingw32-make.exe", "-f", "Makefile", "appnever_give_up_automoc_json_extraction"],
+			"working_dir": "${project_path}",
+			"file_regex": "^(..[^:]*)(?::|\\()([0-9]+)(?::|\\))(?:([0-9]+):)?\\s*(.*)"
+		},
+		{
+			"name": "never_give_up - appnever_give_up_qmltyperegistration",
+			"cmd": ["C:/Qt/Tools/mingw1120_64/bin/mingw32-make.exe", "-f", "Makefile", "appnever_give_up_qmltyperegistration"],
+			"working_dir": "${project_path}",
+			"file_regex": "^(..[^:]*)(?::|\\()([0-9]+)(?::|\\))(?:([0-9]+):)?\\s*(.*)"
+		},
+		{
+			"name": "never_give_up - all_qmltyperegistrations",
+			"cmd": ["C:/Qt/Tools/mingw1120_64/bin/mingw32-make.exe", "-f", "Makefile", "all_qmltyperegistrations"],
+			"working_dir": "${project_path}",
+			"file_regex": "^(..[^:]*)(?::|\\()([0-9]+)(?::|\\))(?:([0-9]+):)?\\s*(.*)"
+		},
+		{
+			"name": "never_give_up - appnever_give_up_other_files",
+			"cmd": ["C:/Qt/Tools/mingw1120_64/bin/mingw32-make.exe", "-f", "Makefile", "appnever_give_up_other_files"],
+			"working_dir": "${project_path}",
+			"file_regex": "^(..[^:]*)(?::|\\()([0-9]+)(?::|\\))(?:([0-9]+):)?\\s*(.*)"
+		},
+		{
+			"name": "never_give_up - appnever_give_up_qmllint",
+			"cmd": ["C:/Qt/Tools/mingw1120_64/bin/mingw32-make.exe", "-f", "Makefile", "appnever_give_up_qmllint"],
+			"working_dir": "${project_path}",
+			"file_regex": "^(..[^:]*)(?::|\\()([0-9]+)(?::|\\))(?:([0-9]+):)?\\s*(.*)"
+		},
+		{
+			"name": "never_give_up - appnever_give_up_qmllint_json",
+			"cmd": ["C:/Qt/Tools/mingw1120_64/bin/mingw32-make.exe", "-f", "Makefile", "appnever_give_up_qmllint_json"],
+			"working_dir": "${project_path}",
+			"file_regex": "^(..[^:]*)(?::|\\()([0-9]+)(?::|\\))(?:([0-9]+):)?\\s*(.*)"
+		},
+		{
+			"name": "never_give_up - all_qmllint",
+			"cmd": ["C:/Qt/Tools/mingw1120_64/bin/mingw32-make.exe", "-f", "Makefile", "all_qmllint"],
+			"working_dir": "${project_path}",
+			"file_regex": "^(..[^:]*)(?::|\\()([0-9]+)(?::|\\))(?:([0-9]+):)?\\s*(.*)"
+		},
+		{
+			"name": "never_give_up - all_qmllint_json",
+			"cmd": ["C:/Qt/Tools/mingw1120_64/bin/mingw32-make.exe", "-f", "Makefile", "all_qmllint_json"],
+			"working_dir": "${project_path}",
+			"file_regex": "^(..[^:]*)(?::|\\()([0-9]+)(?::|\\))(?:([0-9]+):)?\\s*(.*)"
+		},
+		{
+			"name": "never_give_up - appnever_give_up_qmlimportscan",
+			"cmd": ["C:/Qt/Tools/mingw1120_64/bin/mingw32-make.exe", "-f", "Makefile", "appnever_give_up_qmlimportscan"],
+			"working_dir": "${project_path}",
+			"file_regex": "^(..[^:]*)(?::|\\()([0-9]+)(?::|\\))(?:([0-9]+):)?\\s*(.*)"
+		},
+		{
+			"name": "never_give_up - edit_cache",
+			"cmd": ["C:/Qt/Tools/mingw1120_64/bin/mingw32-make.exe", "-f", "Makefile", "edit_cache"],
+			"working_dir": "${project_path}",
+			"file_regex": "^(..[^:]*)(?::|\\()([0-9]+)(?::|\\))(?:([0-9]+):)?\\s*(.*)"
+		},
+		{
+			"name": "never_give_up - rebuild_cache",
+			"cmd": ["C:/Qt/Tools/mingw1120_64/bin/mingw32-make.exe", "-f", "Makefile", "rebuild_cache"],
+			"working_dir": "${project_path}",
+			"file_regex": "^(..[^:]*)(?::|\\()([0-9]+)(?::|\\))(?:([0-9]+):)?\\s*(.*)"
+		},
+		{
+			"name": "never_give_up - list_install_components",
+			"cmd": ["C:/Qt/Tools/mingw1120_64/bin/mingw32-make.exe", "-f", "Makefile", "list_install_components"],
+			"working_dir": "${project_path}",
+			"file_regex": "^(..[^:]*)(?::|\\()([0-9]+)(?::|\\))(?:([0-9]+):)?\\s*(.*)"
+		},
+		{
+			"name": "never_give_up - install",
+			"cmd": ["C:/Qt/Tools/mingw1120_64/bin/mingw32-make.exe", "-f", "Makefile", "install"],
+			"working_dir": "${project_path}",
+			"file_regex": "^(..[^:]*)(?::|\\()([0-9]+)(?::|\\))(?:([0-9]+):)?\\s*(.*)"
+		},
+		{
+			"name": "never_give_up - install/local",
+			"cmd": ["C:/Qt/Tools/mingw1120_64/bin/mingw32-make.exe", "-f", "Makefile", "install/local"],
+			"working_dir": "${project_path}",
+			"file_regex": "^(..[^:]*)(?::|\\()([0-9]+)(?::|\\))(?:([0-9]+):)?\\s*(.*)"
+		},
+		{
+			"name": "never_give_up - install/strip",
+			"cmd": ["C:/Qt/Tools/mingw1120_64/bin/mingw32-make.exe", "-f", "Makefile", "install/strip"],
+			"working_dir": "${project_path}",
+			"file_regex": "^(..[^:]*)(?::|\\()([0-9]+)(?::|\\))(?:([0-9]+):)?\\s*(.*)"
+		},
+		{
+			"name": "never_give_up - appnever_give_up_autogen",
+			"cmd": ["C:/Qt/Tools/mingw1120_64/bin/mingw32-make.exe", "-f", "Makefile", "appnever_give_up_autogen"],
+			"working_dir": "${project_path}",
+			"file_regex": "^(..[^:]*)(?::|\\()([0-9]+)(?::|\\))(?:([0-9]+):)?\\s*(.*)"
+		}
+	]
+}

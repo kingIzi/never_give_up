@@ -4,6 +4,7 @@ import QtQuick.Controls.Material
 import Constants 1.0
 import AdminTableModel 1.0
 import "../customs"
+import "../../../scripts/requests.js" as Req
 
 Item{
     id: _tableItem
@@ -12,6 +13,21 @@ Item{
     implicitHeight: _col5L.implicitHeight
     readonly property alias _titleLabel: _tableTitleLabel
     readonly property alias _tableViewModel: _tableModel
+    Component.onCompleted: {
+        const users = Req.availableUsersList()
+        _agent.requestUsersList(users)
+    }
+    Connections{
+        target: _agent
+        function onUsersList(users){
+            _tableModel.populate(users)
+        }
+        function onUpdatedUser(updatedUser){
+//            const users = Req.availableUsersList()
+//            _agent.requestUsersList(users)
+            _tableModel.onUpdatedItem(updatedUser)
+        }
+    }
     Component{
         id: _tableDel
         Loader{
@@ -68,10 +84,14 @@ Item{
                     contentItem: TextField{
                         id: _editText
                         onAccepted: {
-                            if (_editText.text.length === 0)
+                            if (_editText.text.length === 0){
                                 _itemSelectionModel.clearSelection();
-                            else
+                            }
+                            else{
                                 _tableModel.setItemAt(_tableModel.index(model.row,model.column),_editText.text)
+                                const item = _tableModel.findItemAt(_tableModel.index(model.row,model.column))
+                                _agent.requestUserUpdate(item.userId,item)
+                            }
                         }
                         focus: true
                         text: _del1.text
@@ -144,13 +164,6 @@ Item{
                     clip: true
                     interactive: true
                     alternatingRows: true
-                    Connections{
-                        target: _tableModel
-                        function onItemChanged(item){
-                            _admin.requestUpdateUser(item)
-                        }
-                    }
-
                     model: AdminTableModel{
                         id: _tableModel
                         headers: ["Full Name","Email","Phone Number","Role","Since"]

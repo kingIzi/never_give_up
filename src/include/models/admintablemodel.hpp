@@ -41,6 +41,7 @@ public:
     Request* tableRequests() const;
 
     Q_INVOKABLE void setItemAt(const QModelIndex& index,const QString data);
+    Q_INVOKABLE res::FoundUser findItemAt(const QModelIndex& index) const;
 
 signals:
     void headersChanged();
@@ -49,10 +50,12 @@ signals:
     void tableResponseChanged();
     void tableDataChanged();
     void itemChanged(const res::FoundUser);
+    void updatedItem(const res::FoundUser);
     //void adminTableDataChanged();
 
 public slots:
     void onPopulate(const QList<res::FoundUser> users);
+    void onUpdatedItem(const res::FoundUser item);
     void setHeaders(const QStringList& headers);
     void setTableResponse(Response* response);
     void setTableRequests(Request* request);
