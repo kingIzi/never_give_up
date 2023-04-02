@@ -4,17 +4,15 @@
 #include <QLocale>
 #include <QTranslator>
 #include <QQmlContext>
-//#include <QtWebEngineQuick/QtWebEngineQuick>
 
 #include "admintablemodel.hpp"
-#include "admin.hpp"
+//#include "admin.hpp"
 #include "agent.hpp"
 
 int main(int argc, char *argv[])
 {
     QApplication::setAttribute(Qt::AA_ShareOpenGLContexts);
     QSettings::setDefaultFormat(QSettings::IniFormat); // personal preference
-    //QtWebEngineQuick::initialize();
 
     QApplication app(argc, argv);
     app.setOrganizationName("IziIndustries");
@@ -31,14 +29,14 @@ int main(int argc, char *argv[])
         }
     }
 
-    Admin admin("http://localhost:8084");
+//    Admin admin("http://localhost:8084");
     Agent agent;
-    AdminTableData adminTableData;
+    const auto adminTableData = std::unique_ptr<AdminTableData>();
     QQmlApplicationEngine engine;
     const QUrl url(u"qrc:/never_give_up/forms/qml/main.qml"_qs);
     engine.rootContext()->setContextProperty("_agent",&agent);
-    engine.rootContext()->setContextProperty("_admin",&admin);
-    engine.rootContext()->setContextProperty("_adminTableData",&adminTableData);
+//    engine.rootContext()->setContextProperty("_admin",&admin);
+    engine.rootContext()->setContextProperty("_adminTableData",adminTableData.get());
 
     qmlRegisterType<AdminTableModel>("AdminTableModel",1,0,"AdminTableModel");
     qmlRegisterSingletonType(QUrl("qrc:/never_give_up/forms/qml/Constants.qml"), "Constants", 1, 0, "Constants");

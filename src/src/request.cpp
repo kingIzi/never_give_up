@@ -26,7 +26,7 @@ const char* Request::URL_FORMAT_REGEX = "^(https?:\/\/)?[0-9a-z]+\.[-_0-9a-z]+\.
 
 //construct class initializes all members
 Request::Request(const QString& baseUrl, QObject* parent) :
-    QObject{parent},idToken(),multiPart(nullptr),baseUrl(baseUrl),
+    QObject{parent},idToken(),baseUrl(baseUrl),
     manager(std::make_unique<QNetworkAccessManager>()), isOperating(false)
 {
 	try {
@@ -109,33 +109,6 @@ QNetworkReply* Request::makeJsonPostRequest(const QUrl& url, const QString& idTo
     return this->manager->post(request,document.toJson());
 }
 
-QNetworkReply *Request::makeJsonMultiPartJsonPost(const QUrl &url, const QString &idToken, const QJsonDocument &document)
-{
-    QHttpMultiPart *multiPart = new QHttpMultiPart(QHttpMultiPart::FormDataType);
-
-    QHttpPart textPart;
-    textPart.setHeader(QNetworkRequest::ContentDispositionHeader, QVariant(document.toJson()));
-    textPart.setBody("my text");
-
-    QHttpPart imagePart;
-    imagePart.setHeader(QNetworkRequest::ContentTypeHeader, QVariant("image/jpeg"));
-    imagePart.setHeader(QNetworkRequest::ContentDispositionHeader, QVariant("form-data; name=\"image\""));
-    QFile *file = new QFile("image.jpg");
-    file->open(QIODevice::ReadOnly);
-    imagePart.setBodyDevice(file);
-    file->setParent(multiPart); // we cannot delete the file now, so delete it with the multiPart
-
-    multiPart->append(textPart);
-    multiPart->append(imagePart);
-
-    QNetworkRequest request(url);
-
-    QNetworkAccessManager manager;
-    QNetworkReply *reply = manager.post(request, multiPart);
-    multiPart->setParent(reply); // delete the multiPart with the reply
-    // here connect signals etc.
-}
-
 QNetworkReply* Request::makeRequestNoIdtoken(const QUrl& url, const QJsonDocument& document) {
      if (document.isEmpty())
         return nullptr;
@@ -157,13 +130,54 @@ QNetworkReply* Request::makeMultiPutRequest(const QUrl& url, const QString& idTo
     if (!url.isValid())
         throw std::runtime_error("RUNTIME ERROR: INVALID_URL");
 
-    this->multiPart = std::make_unique<QHttpMultiPart>(QHttpMultiPart::FormDataType);
-    this->appendHttpParts(document);
+    const auto multiPart = new QHttpMultiPart(QHttpMultiPart::FormDataType);
+    this->appendHttpParts(document,multiPart);
     QNetworkRequest request(url);
     const auto headerBearerToken = QString("Bearer %1").arg(idToken);
     request.setRawHeader(QByteArray("Authorization"), headerBearerToken.toUtf8());
-    const auto reply = this->manager->put(request,this->multiPart.get());
-    this->multiPart->setParent(reply);
+    const auto reply = this->manager->put(request,multiPart);
+    multiPart->setParent(reply);
+    QObject::connect(reply,&QNetworkReply::finished,this,[reply,multiPart,this](){
+        if (reply){
+            const auto document = reply ? QJsonDocument::fromJson(reply->readAll()) : QJsonDocument();
+            emit Request::replyReadyRead(document);
+            reply->deleteLater();
+        }
+        if (multiPart){
+            multiPart->deleteLater();
+        }
+    });
+    QObject::connect(reply,&QNetworkReply::uploadProgress,this,&Request::uploadProgressChanged);
+    return reply;
+}
+
+const QNetworkReply *Request::makeMultiPostRequest(const QUrl &url, const QString &idToken, const QJsonDocument &document)
+{
+    if (idToken.isEmpty())
+        throw std::runtime_error("NO IDTOKEN FOUND TO REQUEST");
+    if (document.isNull() || document.isEmpty())
+        return nullptr;
+    if (!url.isValid())
+        throw std::runtime_error("RUNTIME ERROR: INVALID_URL");
+
+    const auto multiPart = new QHttpMultiPart(QHttpMultiPart::FormDataType);
+    this->appendHttpParts(document,multiPart);
+    QNetworkRequest request(url);
+    const auto headerBearerToken = QString("Bearer %1").arg(idToken);
+    request.setRawHeader(QByteArray("Authorization"), headerBearerToken.toUtf8());
+    const auto reply = this->manager->post(request,multiPart);
+    QObject::connect(reply,&QNetworkReply::uploadProgress,this,&Request::uploadProgressChanged);
+    QObject::connect(reply,&QNetworkReply::finished,this,[reply,multiPart,this](){
+        if (reply){
+            const auto document = reply ? QJsonDocument::fromJson(reply->readAll()) : QJsonDocument();
+            emit Request::replyReadyRead(document);
+            reply->deleteLater();
+        }
+        if (multiPart){
+            multiPart->deleteLater();
+        }
+    });
+    multiPart->setParent(reply);
     return reply;
 }
 
@@ -232,19 +246,19 @@ const QString Request::contentDispositionValue(const QString key) const
     return QString("form-data; name=\"" + key + "\"");
 }
 
-void Request::appendHttpParts(const QJsonDocument &document) const
+void Request::appendHttpParts(const QJsonDocument &document,QHttpMultiPart * const multiPart) const
 {
-    if (document.isObject() && this->multiPart.get()){
+    if (document.isObject() && multiPart){
         const auto values = document.object();
         const auto keys = values.keys();
-        std::for_each(keys.begin(),keys.end(),[this,values](const QString& key){
+        std::for_each(keys.begin(),keys.end(),[this,values,multiPart](const QString& key){
             QHttpPart textPart;
             textPart.setHeader(QNetworkRequest::ContentDispositionHeader,this->contentDispositionValue(key));
             textPart.setBody(values.value(key).toVariant().toByteArray());
-            this->multiPart->append(textPart);
+            multiPart->append(textPart);
         });
         const auto files = values.value("files").isNull() ? QJsonObject() : values.value("files").toObject();
-        this->appendHttpFilePart(files);
+        this->appendHttpFilePart(files,multiPart);
     }
 }
 
@@ -283,14 +297,15 @@ const QList<QHttpPart> Request::buildRequestHttpParts(const QJsonDocument& docum
     return parts;
 }
 
-void Request::appendHttpFilePart(const QJsonObject &files) const
+void Request::appendHttpFilePart(const QJsonObject &files,QHttpMultiPart * const multiPart) const
 {
-    if (files.isEmpty() || !this->multiPart.get()) { return; }
+    if (files.isEmpty() || !multiPart) { return; }
     const auto keys = files.keys();
     for (const auto& key : keys){
         const QFileInfo fileInfo(files.value(key).toString());
         if (!fileInfo.isFile())
             throw std::invalid_argument("One of the files specified does not exist or has been deleted from location.");
+
         QHttpPart filePart;
         filePart.setHeader(QNetworkRequest::ContentTypeHeader, QMimeDatabase().mimeTypeForFile(fileInfo.absoluteFilePath()).name());
         filePart.setHeader(QNetworkRequest::ContentDispositionHeader,this->contentDispositionValue(key));
@@ -298,8 +313,8 @@ void Request::appendHttpFilePart(const QJsonObject &files) const
         if (!file->open(QIODevice::ReadOnly))
             throw std::invalid_argument("Failed to open file specified. Please verify path exists");
         filePart.setBodyDevice(file);
-        file->setParent(this->multiPart.get());
-        this->multiPart->append(filePart);
+        file->setParent(multiPart);
+        multiPart->append(filePart);
     }
 }
 

@@ -34,7 +34,7 @@ public slots:
     void setIsLoggedIn(const bool arg);
 public:
     explicit Agent(QObject *parent = nullptr);
-    Q_INVOKABLE  void storeAgentAuth() const;
+    Q_INVOKABLE void storeAgentAuth() const;
     Q_INVOKABLE void requestLogin(const QVariantMap body);
     Q_INVOKABLE void requestUsersList(const QVariantMap body);
     Q_INVOKABLE void requestUserUpdate(const QString userId,const Person* user);

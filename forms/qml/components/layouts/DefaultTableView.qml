@@ -23,10 +23,8 @@ Item{
             _tableModel.populate(users)
         }
         function onUpdatedUser(updatedUser){
-//            const users = Req.availableUsersList()
-//            _agent.requestUsersList(users)
-            //_tableModel.onUpdatedItem(updatedUser)
             console.log(updatedUser)
+            _tableModel.onUpdatedItem(updatedUser)
         }
     }
     Component{
@@ -169,7 +167,7 @@ Item{
                     model: AdminTableModel{
                         id: _tableModel
                         headers: ["Full Name","Email","Phone Number","Role","Since"]
-
+                        adminTableData: _adminTableData
                     }
                     selectionModel: ItemSelectionModel{
                         id: _itemSelectionModel

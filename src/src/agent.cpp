@@ -157,7 +157,8 @@ void Agent::requestUserUpdate(const QString userId,const Person* person)
        QObject::connect(this->request_ptr.get(),&Request::replyReadyRead,this,&Agent::onRequestUserUpdate);
        const auto reply = this->request_ptr->makeMultiPutRequest(url,idToken,person->userModifiableValuesDocumentForm());
        this->setIsRequesting(true);
-       this->request_ptr->connectReplyReadyRead(reply);
+       Q_UNUSED(reply);
+       //this->request_ptr->connectReplyReadyRead(reply);
     }
     catch(const QException& e){
         qDebug() << e.what();

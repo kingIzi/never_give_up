@@ -5,9 +5,8 @@
 
 void AdminTableModel::populationSignals()
 {
-    if (this->adminTableData_ptr){
+    if (this->adminTableData_ptr2){
         QObject::connect(this->adminTableData_ptr2,&AdminTableData::postItemAppended,this,[this](){
-            //const auto index = this->adminTableData_ptr->getAdmins().size();
             const auto index = this->adminTableData_ptr2->getPersons().size();
             this->beginInsertRows(QModelIndex(),index,index);
         });
@@ -27,7 +26,6 @@ AdminTableModel::AdminTableModel(QAbstractTableModel *parent)
     : QAbstractTableModel{parent},
       request(nullptr),
       response(nullptr),
-      adminTableData_ptr(nullptr),
       adminTableData_ptr2(nullptr)
 {
     QObject::connect(this,&AdminTableModel::populate,this,&AdminTableModel::onPopulate);
@@ -78,15 +76,15 @@ const QVariant AdminTableModel::switchDataResponse(const QModelIndex& index) con
         const auto& users = this->adminTableData_ptr2->getTableData();
         switch (index.column()){
         case 0:
-            return users.at(index.row()).at(index.column()).toString();
+            return this->adminTableData_ptr2->getPersons().at(index.row())->fullName();
         case 1:
-            return users.at(index.row()).at(index.column()).toString();
+            return this->adminTableData_ptr2->getPersons().at(index.row())->email();
         case 2:
-            return users.at(index.row()).at(index.column()).toString();
+            return this->adminTableData_ptr2->getPersons().at(index.row())->phoneNumber();
         case 3:
-            return users.at(index.row()).at(index.column()).toString();
+            return this->adminTableData_ptr2->getPersons().at(index.row())->role();
         case 4:
-            return users.at(index.row()).at(index.column()).toDateTime().toString(res::dateTimeFormatShort);
+            return this->adminTableData_ptr2->getPersons().at(index.row())->dateCreated().toString(res::dateTimeFormatShort);
         default:
             return QVariant();
         }
@@ -146,44 +144,54 @@ void AdminTableModel::setItemAt(const QModelIndex& index,const QString data)
 
 Person *AdminTableModel::findItemAt(const QModelIndex &index) const
 {
-    return this->adminTableData_ptr->getPersons().at(index.row());
+    return this->adminTableData_ptr2->getPersons().at(index.row());
 }
 
 QVariantMap AdminTableModel::getItemAtAsMap(const QModelIndex &index) const
 {
-    const auto& person = this->adminTableData_ptr->getPersons().at(index.row());
+    const auto& person = this->adminTableData_ptr2->getPersons().at(index.row());
     return person->getAsMap();
 }
 
 void AdminTableModel::onPopulate(const QList<Person*> persons)
 {
-    if (this->adminTableData_ptr && this->adminTableData_ptr->getPersons() == persons){
+    if (persons.isEmpty())
         return;
-    }
     this->beginResetModel();
-    if (this->adminTableData_ptr2){
+    if (this->adminTableData_ptr2 && this->adminTableData_ptr2->getPersons() == persons){
         this->adminTableData_ptr2->disconnect(this);
         this->adminTableData_ptr2->deleteLater();
     }
     this->adminTableData_ptr2 = new AdminTableData(persons);
-    //this->adminTableData_ptr = std::make_unique<AdminTableData>(persons);
+    this->adminTableData_ptr2->setPersons(persons);
     this->populationSignals();
+    this->adminTableData_ptr2->itemModified();
     this->endResetModel();
-
 }
 
 void AdminTableModel::onUpdatedItem(Person *person)
 {
-    const auto it = std::find_if(std::begin(this->adminTableData_ptr->getPersons()),std::end(this->adminTableData_ptr->getPersons()),[person](const Person* value){
+//    const auto it = std::find_if(std::begin(this->adminTableData_ptr2->getPersons()),std::end(this->adminTableData_ptr2->getPersons()),[person](const Person* value){
+//        return person->userId().compare(value->userId()) == 0;
+//    });
+//    if (it != std::end(this->adminTableData_ptr2->getPersons())){
+//        qDebug() << "ITEM FOUND";
+//        this->beginResetModel();
+//        this->adminTableData_ptr2->setItemAt(std::distance(it,std::end(this->adminTableData_ptr2->getPersons())),person);
+//        this->populationSignals();
+//        this->endResetModel();
+//    }
+    const auto it = std::find_if(std::begin(this->adminTableData_ptr2->getPersons()),std::end(this->adminTableData_ptr2->getPersons()),[person](const Person* value){
         return person->userId().compare(value->userId()) == 0;
     });
-    if (it != std::end(this->adminTableData_ptr->getPersons())){
+    if (it != std::end(this->adminTableData_ptr2->getPersons())){
         qDebug() << "ITEM FOUND";
         this->beginResetModel();
-        this->adminTableData_ptr->setItemAt(std::distance(it,std::end(this->adminTableData_ptr->getPersons())),person);
+        this->adminTableData_ptr2->setItemAt(std::distance(it,std::end(this->adminTableData_ptr2->getPersons())),person);
         this->populationSignals();
         this->endResetModel();
     }
+    qDebug() << this->adminTableData_ptr2->getPersons().at(0)->phoneNumber();
 }
 
 void AdminTableModel::setHeaders(const QStringList &headers)

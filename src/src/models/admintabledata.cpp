@@ -1,16 +1,5 @@
 #include "admintabledata.hpp"
 
-//AdminTableData::AdminTableData(const QList<res::FoundUser>& admins, QObject *parent)
-//    : QObject{parent},
-//      admins(admins)
-//{
-//    this->tableData.reserve(this->admins.size());
-//    for (const auto& admin : this->admins){
-//        const auto data = admin.getFullNameAndEmailAndTelephoneAndRoleAndDateCreated();
-//        this->tableData.emplaceBack(data);
-//    }
-//}
-
 AdminTableData::AdminTableData(const QList<Person*>& persons,QObject * parent) :
     QObject{parent},
     persons(persons)
@@ -23,7 +12,8 @@ AdminTableData::AdminTableData(const QList<Person*>& persons,QObject * parent) :
     }
 }
 
-AdminTableData::AdminTableData(QObject *parent)
+AdminTableData::AdminTableData(QObject *parent) :
+    QObject{parent}
 {
 
 }

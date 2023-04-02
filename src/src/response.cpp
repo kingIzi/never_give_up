@@ -53,24 +53,6 @@ QNetworkReply* Response::getReply() const {
     return this->reply;
 }
 
-// template<class T>
-// const T Response::parseResponse(const QJsonDocument &document) const
-// {
-// 	try{
-// 		if (!document.isObject())
-// 			throw std::runtime_error("Error occured...All Requests should be objects");
-// 		const auto res = document.object();
-// 		if (res.value("status").toObject().value("code") == 200)
-// 			return res.value("response");
-// 		else
-// 			return res.value("status");
-// 	}
-// 	catch(const std::runtime_error& e){
-// 		qDebug() << e.what();
-// 		return QJsonValue();
-// 	}
-// }
-
 const QJsonValue Response::parseResponse(const QJsonDocument& document) {
     try{
         if (document.isEmpty() || !document.isObject())

@@ -16,7 +16,6 @@ class AdminTableModel : public QAbstractTableModel
 private:
     QStringList tableHeaders;
     AdminTableData* adminTableData_ptr2;
-    std::unique_ptr<AdminTableData> adminTableData_ptr;
     Request* request;
     Response* response;
 private:

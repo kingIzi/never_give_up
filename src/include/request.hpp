@@ -28,14 +28,14 @@ private:
 	QString baseUrl;
     QString idToken;
 	std::unique_ptr<QNetworkAccessManager> manager;
-    std::unique_ptr<QHttpMultiPart> multiPart;
+    //std::unique_ptr<QHttpMultiPart> multiPart;
 	bool isOperating;
 	static const char* URL_FORMAT_REGEX;
 private:
 	const QList<QHttpPart> buildRequestHttpParts(const QJsonDocument& document, QHttpMultiPart* multiPart) const;
-    void appendHttpFilePart(const QJsonObject& files) const;
+    void appendHttpFilePart(const QJsonObject& files,QHttpMultiPart * const multiPart) const;
     const QString contentDispositionValue(const QString key) const;
-    void appendHttpParts(const QJsonDocument& document) const;
+    void appendHttpParts(const QJsonDocument& document,QHttpMultiPart *const multiPart) const;
 public:
 	struct Endpoint {
 		//session
@@ -95,11 +95,10 @@ public:
 
 	QNetworkReply* makeJsonPostRequest(const QUrl& url, const QString& idToken,
 	                                        const QJsonDocument& document);
-    QNetworkReply* makeJsonMultiPartJsonPost(const QUrl& url,const QString& idToken,const QJsonDocument& document);
     QNetworkReply* makeRequestNoIdtoken(const QUrl& url,const QJsonDocument& document);
 
-	QNetworkReply* makeMultiPutRequest(const QUrl& url, const QString& idToken,
-	                                   const QJsonDocument& document);
+    QNetworkReply* makeMultiPutRequest(const QUrl& url, const QString& idToken,const QJsonDocument& document);
+    QNetworkReply const* makeMultiPostRequest(const QUrl& url, const QString& idToken,const QJsonDocument& document);
 
 	QNetworkReply* makeGetRequest(const QUrl& url, const QString& idToken);
 	QNetworkReply* makeDeleteRequest(const QUrl& url, const QString& idToken);
