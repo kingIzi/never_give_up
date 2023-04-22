@@ -1,6 +1,6 @@
 #pragma once
 
-#include "admin.hpp"
+#include "admintabledata.hpp"
 #include <qqml.h>
 #include <QAbstractTableModel>
 
@@ -9,15 +9,11 @@ class AdminTableModel : public QAbstractTableModel
     Q_OBJECT
     QML_ELEMENT
     QML_ADDED_IN_MINOR_VERSION(1)
-    Q_PROPERTY(Request* tableRequests READ tableRequests WRITE setTableRequests NOTIFY tableRequestsChanged);
-    Q_PROPERTY(Response* tableResponse READ tableResponse WRITE setTableResponse NOTIFY tableResponseChanged);
     Q_PROPERTY(QStringList headers READ headers WRITE setHeaders NOTIFY headersChanged);
     Q_PROPERTY(AdminTableData* adminTableData READ adminTableData WRITE setAdminTableData NOTIFY adminTableDataChanged)
 private:
     QStringList tableHeaders;
     AdminTableData* adminTableData_ptr2;
-    Request* request;
-    Response* response;
 private:
     void populationSignals();
 public:
@@ -34,8 +30,6 @@ public:
     QHash<int, QByteArray> roleNames() const override;
 
     const QStringList headers() const;
-    Response* tableResponse() const;
-    Request* tableRequests() const;
     AdminTableData* adminTableData() const;
 
     Q_INVOKABLE void setItemAt(const QModelIndex& index,const QString data);
@@ -46,8 +40,6 @@ signals:
     void headersChanged();
     //void populate(const QList<res::FoundUser>);
     void populate(const QList<Person*>);
-    void tableRequestsChanged();
-    void tableResponseChanged();
     void tableDataChanged();
     void itemChanged(const res::FoundUser);
     //void updatedItem(const res::FoundUser);
@@ -60,8 +52,6 @@ public slots:
     //void onUpdatedItem(const res::FoundUser item);
     void onUpdatedItem(Person* person);
     void setHeaders(const QStringList& headers);
-    void setTableResponse(Response* response);
-    void setTableRequests(Request* request);
     void setAdminTableData(AdminTableData* adminTableData);
     //void setAdminTableData(AdminTableData* adminTableData);
 };

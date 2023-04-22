@@ -10,7 +10,6 @@ class AdminTableData : public QObject
 private:
     //QList<res::FoundUser> admins;
     QList<Person*> persons;
-    QList<QList<QVariant>> tableData;
 signals:
     void preItemAppended();
     void postItemAppended();
@@ -26,9 +25,6 @@ public:
     const QList<Person*>& getPersons() const;
     //QList<res::FoundUser>& getModifiableAdmins();
     QList<Person*>& getModifiablePersons();
-    void setTableData(const QList<QList<QVariant>>& variants);
-    const QList<QList<QVariant>> getTableData() const;
-    void itemModified();
 public slots:
 //    void setItemAt(const res::FoundUser& admin,const QModelIndex & index = QModelIndex());
 //    void setItemAt(const int index,const res::FoundUser& item);

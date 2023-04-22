@@ -4,12 +4,7 @@ AdminTableData::AdminTableData(const QList<Person*>& persons,QObject * parent) :
     QObject{parent},
     persons(persons)
 {
-    if (this->persons.isEmpty()) { return; }
-    this->tableData.reserve(this->persons.size());
-    for (const auto& person : this->persons){
-        const auto dataList = person->getFullNameAndEmailAndTelephoneAndRoleAndDateCreated();
-        this->tableData.emplaceBack(dataList);
-    }
+
 }
 
 AdminTableData::AdminTableData(QObject *parent) :
@@ -31,17 +26,6 @@ const QList<Person *> &AdminTableData::getPersons() const
 QList<Person *> &AdminTableData::getModifiablePersons()
 {
     return this->persons;
-}
-
-void AdminTableData::itemModified()
-{
-    if (!this->tableData.isEmpty())
-        this->tableData.clear();
-    this->tableData.reserve(this->persons.size());
-    for (const auto& person : this->persons){
-        const auto data = person->getFullNameAndEmailAndTelephoneAndRoleAndDateCreated();
-        this->tableData.emplaceBack(data);
-    }
 }
 
 void AdminTableData::setItemAt(Person *person, const QModelIndex &index)
@@ -67,29 +51,6 @@ void AdminTableData::addItem(Person *person)
     emit AdminTableData::postItemAppended();
 }
 
-//void AdminTableData::setItemAt(const res::FoundUser &admin,const QModelIndex & index)
-//{
-//    if (!index.isValid()) { return; }
-//    const auto currAdmin = this->admins.at(index.row());
-//    if (currAdmin == admin) { return; }
-//    this->admins[index.row()] = admin;
-//}
-
-//void AdminTableData::setItemAt(const int index, const res::FoundUser &admin)
-//{
-//    if (index < 0 || index >= this->admins.size()) { return; }
-//    const auto currAdmin = this->admins.at(index);
-//    if (currAdmin == admin) { return; }
-//    this->admins[index] = admin;
-//}
-
-//void AdminTableData::addItem(const res::FoundUser &admin)
-//{
-//    emit AdminTableData::preItemAppended();
-//    this->admins.push_back(admin);
-//    emit AdminTableData::postItemAppended();
-//}
-
 void AdminTableData::removeItem(const QModelIndex &index)
 {
     emit AdminTableData::preItemRemoved(index);
@@ -101,31 +62,3 @@ void AdminTableData::setPersons(const QList<Person *> &persons)
 {
     this->persons = persons;
 }
-
-//const QList<res::FoundUser>  &AdminTableData::getAdmins() const
-//{
-//    return this->admins;
-//}
-
-//QList<res::FoundUser> &AdminTableData:: getModifiableAdmins()
-//{
-//    return this->admins;
-//}
-
-void AdminTableData::setTableData(const QList<QList<QVariant> > &variants)
-{
-    if (this->tableData != variants)
-        this->tableData = variants;
-}
-
-const QList<QList<QVariant> > AdminTableData::getTableData() const
-{
-    return this->tableData;
-}
-
-//void AdminTableData::setAdmins(const QList<res::FoundUser> &admins)
-//{
-//    if (this->admins != admins)
-//        this->admins = admins;
-//}
-

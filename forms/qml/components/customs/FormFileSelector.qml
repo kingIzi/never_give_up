@@ -1,6 +1,8 @@
 import QtQuick
 import QtQuick.Layouts
 import QtQuick.Controls.Material
+import Qt.labs.platform
+import QtQuick.Dialogs
 import Constants 1.0
 
 Item{
@@ -9,6 +11,18 @@ Item{
     property string _title: ""
     readonly property alias _textField: _textFieldForm
     readonly property alias _textFieldError: _textFieldFormError
+    property url filePath
+    property var nameFilters: []
+    FileDialog {
+        id: fileDialog
+        currentFolder: StandardPaths.standardLocations(StandardPaths.PicturesLocation)[0]
+        onAccepted: {
+            _formDatePicker._title = _agent.selectedFileName(selectedFile.toString())
+            _formDatePicker.filePath = selectedFile
+        }
+
+        nameFilters: _formDatePicker.nameFilters
+    }
     ColumnLayout{
         id: _col4L
         anchors.fill: parent
@@ -37,6 +51,7 @@ Item{
                 Material.background: Constants.colors.primary
                 text: "Fichier"
                 font: Constants.blackFont.h4
+                onClicked: fileDialog.open()
             }
         }
         Label{

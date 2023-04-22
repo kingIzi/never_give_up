@@ -65,8 +65,7 @@ void Admin::findActiveAgent()
         const auto url = this->request_ptr->buildUrl({},Request::Endpoint::userList);
         QObject::connect(this->request_ptr.get(),&Request::replyReadyRead,this,&Admin::onFindActiveAgent);
         this->setIsLoading(true);
-        const auto reply = this->request_ptr->makeJsonPostRequest(url,this->getIdToken().c_str(),QJsonDocument::fromVariant(form));
-        this->request_ptr->connectReplyReadyRead(reply);
+        this->request_ptr->makeJsonPostRequest(url,this->getIdToken().c_str(),QJsonDocument::fromVariant(form));
     } catch (const std::runtime_error& err) {
         qDebug() << err.what();
     }
@@ -269,9 +268,8 @@ void Admin::requestLoginUser(const QVariantMap& body) {
     try {
         const auto url = this->request_ptr->buildUrl({}, Request::Endpoint::sessionLogin);
         QObject::connect(this->request_ptr.get(), &Request::replyReadyRead, this, &Admin::onLoginUser);
-        const auto reply = this->request_ptr->makeRequestNoIdtoken(url, QJsonDocument::fromVariant(body));
+        this->request_ptr->makeRequestNoIdtoken(url, QJsonDocument::fromVariant(body));
         this->setIsLoading(true);
-        this->request_ptr->connectReplyReadyRead(reply);
     } catch (const std::runtime_error& err) {
         qDebug() << err.what();
     }
@@ -282,8 +280,7 @@ void Admin::requestRegisterUser(const QVariantMap& registerUser) {
         const auto url = this->request_ptr->buildUrl({},Request::Endpoint::sessionRegister);
         this->setIsLoading(true);
         QObject::connect(this->request_ptr.get(), &Request::replyReadyRead, this, &Admin::onRegisterUser);
-        const auto reply = this->request_ptr->makeRequestNoIdtoken(url, QJsonDocument::fromVariant(registerUser));
-        this->request_ptr->connectReplyReadyRead(reply);
+        this->request_ptr->makeRequestNoIdtoken(url, QJsonDocument::fromVariant(registerUser));
     }
     catch(const std::runtime_error& err){
         qDebug() << err.what();
@@ -326,8 +323,7 @@ void Admin::requestUsersList(const QVariantMap& form)
         const auto url = this->request_ptr->buildUrl({},Request::Endpoint::userList);
         QObject::connect(this->request_ptr.get(),&Request::replyReadyRead,this,&Admin::onUsersList);
         this->setIsLoading(true);
-        const auto reply = this->request_ptr->makeJsonPostRequest(url,this->getIdToken().c_str(),QJsonDocument::fromVariant(form));
-        this->request_ptr->connectReplyReadyRead(reply);
+        this->request_ptr->makeJsonPostRequest(url,this->getIdToken().c_str(),QJsonDocument::fromVariant(form));
 
     } catch (const std::runtime_error& err) {
         qDebug() << err.what();
@@ -342,9 +338,8 @@ AdminTableData *Admin::adminTableData() const
 void Admin::requestCreateAuthor(const QVariantMap author) {
     const auto url = this->request_ptr->buildUrl({},Request::Endpoint::createAuthor);
     QObject::connect(this->request_ptr.get(),&Request::replyReadyRead,this,&Admin::onCreateAuthor);
-    const auto reply = this->request_ptr->makeJsonPostRequest(url,this->getIdToken().c_str(),QJsonDocument::fromVariant(author));
+    this->request_ptr->makeJsonPostRequest(url,this->getIdToken().c_str(),QJsonDocument::fromVariant(author));
     this->setIsLoading(true);
-    this->request_ptr->connectReplyReadyRead(reply);
 }
 
 void Admin::requestUpdateAuthor(const QString authorId, const QVariantMap author) {

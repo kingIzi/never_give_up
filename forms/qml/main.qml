@@ -30,7 +30,6 @@ ApplicationWindow {
         state: _agent.isLoggedIn ? "navigate" : "session"
         onStateChanged: {
             if (state !== "session")
-                console.log(state)
                 _agent.storeAgentAuth()
         }
         states: [
@@ -45,7 +44,7 @@ ApplicationWindow {
                 name: "navigate"
                 PropertyChanges {
                     target: _appLoader
-                    source: "pages/DashboardPage.qml"
+                    source: "pages/MainNavigation.qml"
                 }
             }
         ]

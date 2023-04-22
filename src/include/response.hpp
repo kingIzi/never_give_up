@@ -5,7 +5,9 @@
 #include <QDateTime>
 #include <QStringList>
 #include "person.hpp"
-#include "request.hpp"
+#include "comic.hpp"
+#include "author.hpp"
+#include "category.hpp"
 
 namespace res{
 
@@ -35,26 +37,26 @@ namespace res{
             return this->message.compare(error.message) != 0 && this->code != error.code;
         }
 	};
-	struct Register{
-	private:
-		Q_GADGET
-	public:
+    struct Register{
+    private:
+        Q_GADGET
+    public:
         Q_PROPERTY(QString idToken MEMBER idToken)
         Q_PROPERTY(QString localId MEMBER localId)
         Q_PROPERTY(QString email MEMBER email)
         Q_PROPERTY(int expiresIn MEMBER expiresIn)
         Q_PROPERTY(QString refreshToken MEMBER refreshToken)
         QString idToken;
-		QString localId;
-		QString email;
-		int expiresIn;
-		QString refreshToken;
+        QString localId;
+        QString email;
+        int expiresIn;
+        QString refreshToken;
         Register() = default;
-		Register(const QString& idToken,const QString& localId,
-			const QString& email,const int& expiresIn,const QString& refreshToken) : 
-			idToken(idToken),localId(localId),email(email),expiresIn(expiresIn),
-			refreshToken(refreshToken)
-		{}
+        Register(const QString& idToken,const QString& localId,
+            const QString& email,const int& expiresIn,const QString& refreshToken) :
+            idToken(idToken),localId(localId),email(email),expiresIn(expiresIn),
+            refreshToken(refreshToken)
+        {}
         Register& operator=(const Register& registeredUser){
             this->idToken = registeredUser.idToken;
             this->localId = registeredUser.localId;
@@ -79,20 +81,20 @@ namespace res{
             const auto matchRefreshToken = this->refreshToken.compare(registeredUser.refreshToken) == 0;
             return matchIdToken && matchLocalId && matchEmail && matchExpiresIn && matchRefreshToken;
         }
-	};
-	struct Login : public Register{
-	private:
-		Q_GADGET
-	public:
-		Login(const QString& idToken,const QString& localId,const QString& email,
-			const int& expiresIn,const QString& refreshToken) : 
-			Register{idToken,localId,email,expiresIn,refreshToken}
-		{}
-        Login() {};
-	};
-	struct FoundUser{
+    };
+    struct Login : public Register{
     private:
-		Q_GADGET
+        Q_GADGET
+    public:
+        Login(const QString& idToken,const QString& localId,const QString& email,
+            const int& expiresIn,const QString& refreshToken) :
+            Register{idToken,localId,email,expiresIn,refreshToken}
+        {}
+        Login() {};
+    };
+    struct FoundUser{
+    private:
+        Q_GADGET
     public:
         Q_PROPERTY(QString userId MEMBER userId)
         Q_PROPERTY(QString email MEMBER email)
@@ -106,28 +108,28 @@ namespace res{
         Q_PROPERTY(QDateTime dateUpdated MEMBER dateUpdated)
         Q_PROPERTY(QString status MEMBER status)
         Q_PROPERTY(QStringList favorites MEMBER favorites)
-		QString userId;
-		QString email;
-		QString localId;
+        QString userId;
+        QString email;
+        QString localId;
         QString phoneNumber;
-		QString fullName;
-		QString photoFileName;
-		QString photoUrl;
-		QString role;
+        QString fullName;
+        QString photoFileName;
+        QString photoUrl;
+        QString role;
         QDateTime dateCreated;
         QDateTime dateUpdated;
-		QString status;
-		QStringList favorites;
+        QString status;
+        QStringList favorites;
         FoundUser() = default;
-		FoundUser(const QString& userId,const QString& email,const QString& localId,
-			const QString& telephone,const QString& fullName,const QString& photoFileName,
+        FoundUser(const QString& userId,const QString& email,const QString& localId,
+            const QString& telephone,const QString& fullName,const QString& photoFileName,
             const QString& photoUrl, const QString& role, const QDateTime& dateCreated,
             const QDateTime& dateUpdated, const QString& status,const QStringList& favorites,
                   const res::Register& registeredUser) :
             userId(userId),email(email),localId(localId),phoneNumber(telephone),fullName(fullName),
-			photoFileName(photoFileName),photoUrl(photoUrl),role(role),dateCreated(dateCreated),
+            photoFileName(photoFileName),photoUrl(photoUrl),role(role),dateCreated(dateCreated),
             dateUpdated(dateUpdated),status(status),favorites(favorites)
-		{}
+        {}
         FoundUser(const QJsonObject& user,const res::Register& registeredUser) :
             userId(user.value("id").toString()),email(user.value("email").toString()),
             localId(user.value("localId").toString()),phoneNumber(user.value("phoneNumber").toString()),
@@ -228,183 +230,39 @@ namespace res{
         const QList<QVariant> getFullNameAndEmailAndTelephoneAndRoleAndDateCreated() const{
             return {this->fullName,this->email,this->phoneNumber,this->role,this->dateCreated};
         }
-	};
-	struct Author{
-    private:
-		Q_GADGET
-    public:
-        Q_PROPERTY(QString authorId MEMBER authorId)
-        Q_PROPERTY(QString firstName MEMBER firstName)
-        Q_PROPERTY(QString lastName MEMBER lastName)
-        Q_PROPERTY(QDate dateOfBirth MEMBER dateOfBirth)
-        Q_PROPERTY(QString address MEMBER address)
-        Q_PROPERTY(QString phoneNumber MEMBER phoneNumber)
-        Q_PROPERTY(QString status MEMBER status)
-        Q_PROPERTY(QString photoUrl MEMBER photoUrl)
-        Q_PROPERTY(QString photoFileName MEMBER photoFileName)
-        Q_PROPERTY(QDate dateCreated MEMBER dateCreated)
-        Q_PROPERTY(QDate dateUpdated MEMBER dateUpdated)
-		QString authorId;
-		QString firstName;
-		QString lastName;
-		QDate dateOfBirth;
-		QString address;
-		QString phoneNumber;
-		QString status;
-		QString photoUrl;
-		QString photoFileName;
-		QDate dateCreated;
-		QDate dateUpdated;
-		Author(const QString& authorId,const QString& firstName,const QString& lastName,
-			const QDate& dateOfBirth,const QString& address,const QString& phoneNumber,
-			const QString& status,const QString& photoUrl,const QString& photoFileName, 
-			const QDate& dateCreated, const QDate& dateUpdated) : 
-			authorId(authorId),firstName(firstName),lastName(lastName),dateOfBirth(dateOfBirth),
-			address(address),phoneNumber(phoneNumber),status(status),photoUrl(photoUrl),
-			photoFileName(photoFileName),dateCreated(dateCreated),dateUpdated(dateUpdated)
-		{}
-        Author(const QJsonObject& author) :
-            authorId(author.value("id").toString()),firstName(author.value("firstName").toString()),
-            lastName(author.value("lastName").toString()),dateOfBirth(author.value("dateOfBirth").toVariant().toDate()),
-            address(author.value("address").toString()),phoneNumber(author.value("phoneNumber").toString()),
-            status(author.value("status").toString()),photoUrl(author.value("photoUrl").toString()),
-            photoFileName(author.value("photoFileName").toString()),dateCreated(author.value("dateCreated").toVariant().toDate()),
-            dateUpdated(author.value("dateUpdated").toVariant().toDate())
-        {}
-        Author& operator=(const Author& author){
-            this->authorId = author.authorId;
-            this->firstName = author.firstName;
-            this->lastName = author.lastName;
-            this->dateOfBirth = author.dateOfBirth;
-            this->address = author.address;
-            this->phoneNumber = author.phoneNumber;
-            this->status = author.status;
-            this->photoUrl = author.photoUrl;
-            this->photoFileName = author.photoFileName;
-            this->dateCreated = author.dateCreated;
-            this->dateUpdated = author.dateUpdated;
-            return (*this);
-        }
-        bool operator==(const Author& author) const{
-            const auto matchAuthorId = this->authorId.compare(author.authorId) == 0;
-            const auto matchFirstName = this->firstName.compare(author.firstName) == 0;
-            const auto matchLastName = this->lastName.compare(author.lastName) == 0;
-            const auto matchDateOfBirth = this->dateOfBirth == author.dateOfBirth;
-            const auto matchAddress = this->address.compare(author.address) == 0;
-            const auto matchPhoneNumber = this->phoneNumber.compare(author.phoneNumber) == 0;
-            const auto matchStatus = this->status.compare(author.status) == 0;
-            const auto matchPhotoUrl = this->photoUrl.compare(author.photoUrl) == 0;
-            const auto matchPhotoFileName = this->photoFileName.compare(author.photoFileName) == 0;
-            const auto matchDateCreated = this->dateCreated == author.dateCreated;
-            const auto matchDateUpdated = this->dateUpdated == author.dateUpdated;
-            return matchAuthorId && matchFirstName && matchLastName && matchDateOfBirth && matchAddress && matchPhoneNumber &&
-                    matchStatus && matchPhotoUrl && matchPhotoFileName && matchDateCreated && matchDateUpdated;
-        }
-        bool operator!=(const Author& author) const{
-            const auto matchAuthorId = this->authorId.compare(author.authorId) != 0;
-            const auto matchFirstName = this->firstName.compare(author.firstName) != 0;
-            const auto matchLastName = this->lastName.compare(author.lastName) != 0;
-            const auto matchDateOfBirth = this->dateOfBirth != author.dateOfBirth;
-            const auto matchAddress = this->address.compare(author.address) != 0;
-            const auto matchPhoneNumber = this->phoneNumber.compare(author.phoneNumber) != 0;
-            const auto matchStatus = this->status.compare(author.status) != 0;
-            const auto matchPhotoUrl = this->photoUrl.compare(author.photoUrl) != 0;
-            const auto matchPhotoFileName = this->photoFileName.compare(author.photoFileName) != 0;
-            const auto matchDateCreated = this->dateCreated != author.dateCreated;
-            const auto matchDateUpdated = this->dateUpdated != author.dateUpdated;
-            return matchAuthorId && matchFirstName && matchLastName && matchDateOfBirth && matchAddress && matchPhoneNumber &&
-                    matchStatus && matchPhotoUrl && matchPhotoFileName && matchDateCreated && matchDateUpdated;
-        }
-	};
-	struct Category{
-		Q_GADGET
-		QString categoryId;
-		QString name;
-		QString description;
-		QString status;
-		QString color;
-		QDate dateCreated;
-		QDate dateUpdated;
-		QString thumbnailUrl;
-		QString thumbnailFileName;
-		Category(const QString& categoryId,const QString& name,const QString& description,
-			const QString& status,const QString& color,const QDate& dateCreated,
-			const QDate& dateUpdated, const QString& thumbnailUrl,const QString& thumbnailFileName) : 
-			categoryId(categoryId),name(name),description(description),status(status),color(color),
-			dateCreated(dateCreated),dateUpdated(dateUpdated),thumbnailUrl(thumbnailUrl),
-			thumbnailFileName(thumbnailFileName)
-		{}
-	};
-	struct Comment{
-		Q_GADGET
-		QString email;
-		QString message;
-		QStringList likes;
-		QList<Comment> replies;
-		QDate dateCreated;
-		QDate dateUpdated;
-		Comment(const QString& email,const QString& message,const QStringList& likes,
-			const QList<Comment>& replies, const QDate& dateCreated,const QDate& dateUpdated) : 
-			email(email), message(message), replies(replies),dateCreated(dateCreated), 
-			dateUpdated(dateUpdated)
-		{}
-	};
-	struct Comic{
-		Q_GADGET
-		QString comicId;
-		QString name;
-		QDate dateReleased;
-		QString description;
-		QStringList categories;
-		QString authorId;
-		QStringList viewers;
-		QStringList likers;
-		QList<Comment> comments;  
-		QDate dateCreated;
-		QDate dateUpdated;
-		QString thumbnailUrl;
-		QString thumbnailFileName;
-		QString dataUrl;
-		QString dataFileName;
-		QString status;
-		Comic(const QString& comicId,const QString& name,const QDate& dateReleased,
-			const QString& description, const QStringList& categories,const QString& authorId,
-			const QStringList& viewers, const QStringList& likers, const QList<Comment>& comments,
-			const QDate& dateCreated, const QDate& dateUpdated, const QString& thumbnailUrl,
-            const QString& thumbnailFileName, const QString& dataUrl, const QString& dataFileName,
-			const QString& status) : 
-			comicId(comicId),name(name),dateReleased(dateReleased),description(description),
-			viewers(viewers),likers(likers),comments(comments),dateCreated(dateCreated), 
-			dateUpdated(dateUpdated),thumbnailUrl(thumbnailUrl),thumbnailFileName(thumbnailFileName),
-			dataUrl(dataUrl), dataFileName(dataFileName),status(status)
-		{}
-	};
+    };
 } //res
 
 class Response : public QObject{
 	Q_OBJECT
-private:
-	QNetworkReply * reply;
 signals:
     void requestUnsuccessfullError(const res::Error);
 public:
-	explicit Response(QNetworkReply* reply = nullptr,QObject * parent = nullptr);
+    explicit Response(QObject * parent = nullptr);
 	~Response();
 
-	// template <class T>
-    // const T parseResponse(const QJsonDocument& data) const;
     const QJsonValue parseLoginResponse(const QJsonDocument& response);
 
     const QJsonValue parseResponse(const QJsonDocument& data);
 
     const res::Error createError(const QJsonObject& error) const noexcept;
     const res::Login createLogin(const QJsonObject& object) const noexcept;
-    //const res::FoundUser createFoundUser(const QJsonObject& res,const res::Register& registeredUser) const noexcept;
     Person* createPerson(const QJsonObject& personRes) const noexcept;
     const res::FoundUser createFoundUser(const QJsonObject& res) const noexcept;
-    //const QList<res::FoundUser> createFoundUserTableData(const QJsonArray& array) const noexcept;
     const QList<Person*> createPersonList(const QJsonArray& personsRes) const noexcept;
     const res::Author createAuthor(const QJsonObject& author) const noexcept;
-    void connectNewReply(QNetworkReply * reply);
-	QNetworkReply* getReply() const;
+    const QList<res::Author> createAuthorList(const QJsonArray& res) const noexcept;
+    const QList<res::Comic*> createComicList(const QJsonArray res) const noexcept;
+    const QList<res::Category> createCategoriesList(const QJsonArray& res) const noexcept;
+    const res::Category createCategory(const QJsonObject& res) const noexcept;
+    res::Comic* createComic(const QJsonObject& object) const noexcept;
+
+    template<class T>
+    const QList<T> createResponseList(QList<T>&& responses,const QJsonArray& res) const noexcept{
+        responses.reserve(res.size());
+        std::for_each(res.begin(),res.end(),[&responses,this](const QJsonValue& val){
+            responses.emplaceBack(T(val.toObject()));
+        });
+        return responses;
+    };
 };

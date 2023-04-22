@@ -29,16 +29,16 @@ Request::Request(const QString& baseUrl, QObject* parent) :
     QObject{parent},idToken(),baseUrl(baseUrl),
     manager(std::make_unique<QNetworkAccessManager>()), isOperating(false)
 {
-	try {
-		if (this->baseUrl == nullptr)
-			throw std::invalid_argument("Error! baseUrl was nullptr");
-		else if (!this->baseUrl.contains(QRegularExpression(Request::URL_FORMAT_REGEX)))
-			throw std::invalid_argument("Error! baseUrl was did not match regex");
-	}
-	catch (const std::invalid_argument&  e) {
-		qDebug() << "Failed to register member Request::baseUrl" << e.what();
-		this->setBaseUrl("");
-	}
+    try {
+        if (this->baseUrl == nullptr)
+            throw std::invalid_argument("Error! baseUrl was nullptr");
+        else if (!this->baseUrl.contains(QRegularExpression(Request::URL_FORMAT_REGEX)))
+            throw std::invalid_argument("Error! baseUrl was did not match regex");
+    }
+    catch (const std::invalid_argument&  e) {
+        qDebug() << "Failed to register member Request::baseUrl" << e.what();
+        this->setBaseUrl("");
+    }
 }
 
 //default destructor
@@ -50,12 +50,12 @@ Request::~Request() {
 
 //sets the base url of the requests
 void Request::setBaseUrl(const QString& baseUrl) {
-	this->baseUrl = baseUrl;
+    this->baseUrl = baseUrl;
 }
 
 //returns the app base url
 const QString Request::getBaseUrl() const {
-	return this->baseUrl;
+    return this->baseUrl;
 }
 
 //resets network manager and points to newManager
@@ -64,12 +64,12 @@ void Request::setManager(QNetworkAccessManager* manager) {
 }
 
 void Request::setIsOperating(const bool isOperating) {
-	this->isOperating = isOperating;
+    this->isOperating = isOperating;
 }
 
 //returns network manager
 QNetworkAccessManager* Request::getManager() {
-	return this->manager.get();
+    return this->manager.get();
 }
 
 //returns whether or not a request is being proccessed
@@ -79,166 +79,145 @@ const bool Request::getIsOperating() const {
 
 void Request::connectReplyReadyRead(QNetworkReply *reply)
 {
-    if (reply){
-        QObject::connect(reply,&QNetworkReply::finished,[this,reply](){
-            try{
-                const auto document = reply ? QJsonDocument::fromJson(reply->readAll()) : QJsonDocument();
+    QObject::connect(reply,&QNetworkReply::finished,[this,reply](){
+        try{
+            if (reply){
+                const auto document = QJsonDocument::fromJson(reply->readAll());
                 emit Request::replyReadyRead(document);
+                reply->deleteLater();
             }
-            catch(const std::exception& e){
-                qDebug() << e.what();
-            }
+        }
+        catch(const std::exception& e){
+            qDebug() << e.what();
+        }
+    });
+}
+
+void Request::connectReplyReadyRead(QNetworkReply * const reply, QHttpMultiPart * const multiPart)
+{
+    QObject::connect(reply,&QNetworkReply::finished,this,[reply,multiPart,this](){
+        if (reply){
+            const auto document = QJsonDocument::fromJson(reply->readAll());
+            emit Request::replyReadyRead(document);
             reply->deleteLater();
-        });
-    }
+        }
+        if (multiPart){
+            multiPart->deleteLater();
+        }
+    });
 }
 
 //make network requests
 
-QNetworkReply* Request::makeJsonPostRequest(const QUrl& url, const QString& idToken, const QJsonDocument& document) {
+void Request::makeJsonPostRequest(const QUrl& url, const QString& idToken, const QJsonDocument& document) {
     if (idToken.isEmpty())
         throw std::runtime_error("NO IDTOKEN FOUND TO REQUEST");
     if (document.isEmpty())
-        return nullptr;
+        return;
     if (!url.isValid())
         throw std::runtime_error("RUNTIME ERROR: INVALID_URL");
+
     QNetworkRequest request(url);
     request.setHeader(QNetworkRequest::ContentTypeHeader, "application/json");
-    const auto headerBearerToken = QString("Bearer %1").arg(idToken);
-    request.setRawHeader(QByteArray("Authorization"), headerBearerToken.toUtf8());
-    return this->manager->post(request,document.toJson());
+    request.setRawHeader(QByteArray("Authorization"), QString("Bearer %1").arg(idToken).toUtf8());
+    const auto reply = this->manager->post(request,document.toJson());
+    QObject::connect(reply,&QNetworkReply::uploadProgress,this,&Request::uploadProgressChanged);
+    this->connectReplyReadyRead(reply);
 }
 
-QNetworkReply* Request::makeRequestNoIdtoken(const QUrl& url, const QJsonDocument& document) {
-     if (document.isEmpty())
-        return nullptr;
-     if (!url.isValid())
+void Request::makeRequestNoIdtoken(const QUrl& url, const QJsonDocument& document) {
+    if (document.isEmpty())
+        return;
+    if (!url.isValid())
         throw std::runtime_error("RUNTIME ERROR: INVALID_URL");
 
-     QNetworkRequest request(url);
-     request.setHeader(QNetworkRequest::ContentTypeHeader, "application/json");
-     const auto reply = this->manager->post(request, document.toJson());
-     QObject::connect(reply,&QNetworkReply::uploadProgress,this,&Request::uploadProgressChanged);
-     return reply;
+    QNetworkRequest request(url);
+    request.setHeader(QNetworkRequest::ContentTypeHeader, "application/json");
+    const auto reply = this->manager->post(request, document.toJson());
+    QObject::connect(reply,&QNetworkReply::uploadProgress,this,&Request::uploadProgressChanged);
+    this->connectReplyReadyRead(reply);
 }
 
-QNetworkReply* Request::makeMultiPutRequest(const QUrl& url, const QString& idToken, const QJsonDocument& document) {
+void Request::makeMultiPutRequest(const QUrl& url, const QString& idToken, const QJsonDocument& document) {
     if (idToken.isEmpty())
         throw std::runtime_error("NO IDTOKEN FOUND TO REQUEST");
     if (document.isNull() || document.isEmpty())
-        return nullptr;
+        return;
     if (!url.isValid())
         throw std::runtime_error("RUNTIME ERROR: INVALID_URL");
 
     const auto multiPart = new QHttpMultiPart(QHttpMultiPart::FormDataType);
     this->appendHttpParts(document,multiPart);
     QNetworkRequest request(url);
-    const auto headerBearerToken = QString("Bearer %1").arg(idToken);
-    request.setRawHeader(QByteArray("Authorization"), headerBearerToken.toUtf8());
+    request.setRawHeader(QByteArray("Authorization"), QString("Bearer %1").arg(idToken).toUtf8());
     const auto reply = this->manager->put(request,multiPart);
     multiPart->setParent(reply);
-    QObject::connect(reply,&QNetworkReply::finished,this,[reply,multiPart,this](){
-        if (reply){
-            const auto document = reply ? QJsonDocument::fromJson(reply->readAll()) : QJsonDocument();
-            emit Request::replyReadyRead(document);
-            reply->deleteLater();
-        }
-        if (multiPart){
-            multiPart->deleteLater();
-        }
-    });
     QObject::connect(reply,&QNetworkReply::uploadProgress,this,&Request::uploadProgressChanged);
-    return reply;
+    this->connectReplyReadyRead(reply,multiPart);
 }
 
-const QNetworkReply *Request::makeMultiPostRequest(const QUrl &url, const QString &idToken, const QJsonDocument &document)
+void Request::makeMultiPostRequest(const QUrl &url, const QString &idToken, const QJsonDocument &document)
 {
     if (idToken.isEmpty())
         throw std::runtime_error("NO IDTOKEN FOUND TO REQUEST");
     if (document.isNull() || document.isEmpty())
-        return nullptr;
+        return;
     if (!url.isValid())
         throw std::runtime_error("RUNTIME ERROR: INVALID_URL");
 
     const auto multiPart = new QHttpMultiPart(QHttpMultiPart::FormDataType);
     this->appendHttpParts(document,multiPart);
     QNetworkRequest request(url);
-    const auto headerBearerToken = QString("Bearer %1").arg(idToken);
-    request.setRawHeader(QByteArray("Authorization"), headerBearerToken.toUtf8());
+    request.setRawHeader(QByteArray("Authorization"), QString("Bearer %1").arg(idToken).toUtf8());
     const auto reply = this->manager->post(request,multiPart);
-    QObject::connect(reply,&QNetworkReply::uploadProgress,this,&Request::uploadProgressChanged);
-    QObject::connect(reply,&QNetworkReply::finished,this,[reply,multiPart,this](){
-        if (reply){
-            const auto document = reply ? QJsonDocument::fromJson(reply->readAll()) : QJsonDocument();
-            emit Request::replyReadyRead(document);
-            reply->deleteLater();
-        }
-        if (multiPart){
-            multiPart->deleteLater();
-        }
-    });
     multiPart->setParent(reply);
-    return reply;
+    QObject::connect(reply,&QNetworkReply::uploadProgress,this,&Request::uploadProgressChanged);
+    this->connectReplyReadyRead(reply,multiPart);
 }
 
-QNetworkReply* Request::makeGetRequest(const QUrl& url, const QString& idToken) {
-	if (idToken.isEmpty())
-		throw std::runtime_error("NO IDTOKEN FOUND TO REQUEST");
-	if (!url.isValid())
-		throw std::runtime_error("RUNTIME ERROR: INVALID_URL");
+void Request::makeGetRequest(const QUrl& url, const QString& idToken) {
+    if (idToken.isEmpty())
+        throw std::runtime_error("NO IDTOKEN FOUND TO REQUEST");
+    if (!url.isValid())
+        throw std::runtime_error("RUNTIME ERROR: INVALID_URL");
 
-	QNetworkRequest request(url);
-	const auto headerBearerToken = QString("Bearer %1").arg(idToken);
-	request.setRawHeader(QByteArray("Authorization"), headerBearerToken.toUtf8());
+    QNetworkRequest request(url);
+    request.setRawHeader(QByteArray("Authorization"), QString("Bearer %1").arg(idToken).toUtf8());
 
-	const auto reply = this->manager->get(request);
-	this->setIsOperating(true);
-	return reply;
-}
-
-QNetworkReply* Request::makeDeleteRequest(const QUrl& url, const QString& idToken) {
-	if (idToken.isEmpty())
-		throw std::runtime_error("NO IDTOKEN FOUND TO REQUEST");
-	if (!url.isValid())
-		throw std::runtime_error("RUNTIME ERROR: INVALID_URL");
-
-	QNetworkRequest request(url);
-	const auto headerBearerToken = QString("Bearer %1").arg(idToken);
-	request.setRawHeader(QByteArray("Authorization"), headerBearerToken.toUtf8());
-
-	const auto reply = this->manager->deleteResource(request);
-	this->setIsOperating(true);
-	return reply;
+    const auto reply = this->manager->get(request);
+    this->setIsOperating(true);
+    QObject::connect(reply,&QNetworkReply::uploadProgress,this,&Request::uploadProgressChanged);
+    this->connectReplyReadyRead(reply);
 }
 
 //helpers
 
 //uses query params and a valid path to build a url (endpoint)
 const QUrl Request::buildUrl(const QList<QPair<QString, QString>>& queries, const QString& path) const {
-	if (this->baseUrl.isEmpty())
-		throw std::invalid_argument("Error! base url is empty");
+    if (this->baseUrl.isEmpty())
+        throw std::invalid_argument("Error! base url is empty");
 
-	const auto removeMissingQueryItems = [](const QPair<QString, QString>& value) {
-		return value.first != nullptr && !value.first.isEmpty() && value.second != nullptr
-		       && !value.second.isEmpty();
-	};
-	QList<QPair<QString, QString>> queryItems;
-	std::copy_if(queries.begin(), queries.end(), std::back_inserter(queryItems), removeMissingQueryItems);
+    const auto removeMissingQueryItems = [](const QPair<QString, QString>& value) {
+        return value.first != nullptr && !value.first.isEmpty() && value.second != nullptr
+                && !value.second.isEmpty();
+    };
+    QList<QPair<QString, QString>> queryItems;
+    std::copy_if(queries.begin(), queries.end(), std::back_inserter(queryItems), removeMissingQueryItems);
 
-	QUrl endpoint(this->baseUrl);
-	endpoint.setPath(path);
-	if (!queryItems.isEmpty()) {
-		QUrlQuery query;
-		query.setQueryItems(queryItems);
-		endpoint.setQuery(query);
-	}
-	return endpoint;
+    QUrl endpoint(this->baseUrl);
+    endpoint.setPath(path);
+    if (!queryItems.isEmpty()) {
+        QUrlQuery query;
+        query.setQueryItems(queryItems);
+        endpoint.setQuery(query);
+    }
+    return endpoint;
 }
 
 const QByteArray Request::buildRawJsonFromDocument(const QJsonDocument& document) const {
-	if (document.isEmpty())
-		return QByteArray();
-	return ((QByteArray) document.toJson()).insert(0, "form-data; ");
+    if (document.isEmpty())
+        return QByteArray();
+    return ((QByteArray) document.toJson()).insert(0, "form-data; ");
 }
 
 const QString Request::contentDispositionValue(const QString key) const
@@ -270,31 +249,6 @@ QString Request::getIdToken() const
 void Request::setIdToken(const QString &newIdToken)
 {
     this->idToken = newIdToken;
-}
-
-const QList<QHttpPart> Request::buildRequestHttpParts(const QJsonDocument& document, QHttpMultiPart* multiPart) const {
-	if (!document.isObject())
-		throw std::runtime_error("Error! Request Body must be an object.");
-
-	auto object = document.object();
-	QList<QHttpPart> parts; parts.reserve(object.keys().size());
-	const auto filesObj = object.value("files").isNull() ? QJsonObject() : object.value("files").toObject();
-	if (!filesObj.isEmpty()) {
-		try {
-            //this->appendHttpFilePart(parts, filesObj, multiPart);
-		}
-		catch (const std::invalid_argument& err) {
-            qDebug() << err.what();
-			return QList<QHttpPart>();
-		}
-		object.remove("files");
-	}
-	const auto rawBody = this->buildRawJsonFromDocument(QJsonDocument::fromVariant(object.toVariantMap()));
-	QHttpPart part;
-	part.setHeader(QNetworkRequest::ContentDispositionHeader, rawBody);
-	part.setBody("DOCUMENT TEXT");
-	parts.push_back(part);
-    return parts;
 }
 
 void Request::appendHttpFilePart(const QJsonObject &files,QHttpMultiPart * const multiPart) const

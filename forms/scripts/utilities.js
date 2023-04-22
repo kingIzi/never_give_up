@@ -1,3 +1,5 @@
+.import "requests.js" as Req
+
 function getNavItems(images) {
     let items = [
             {"icon": images.dashboard,"label": "Dashboard"},
@@ -31,4 +33,25 @@ function getAuthorFilters(icons){
             { "model": ["Alphabetique","Plus-Recent","Plus-Ancien"],"icon":  icons.funnel}
         ]
     return filters
+}
+
+function makeUsersListRequest(){
+    const body = Req.availableUsersList()
+    _agent.requestUsersList(body)
+}
+
+function makeComicListRequest(){
+    const body = Req.availableComics()
+    _agent.requestComicList(body)
+}
+
+function navBarCurrentIndexChanged(currentIndex){
+    switch (currentIndex){
+    case 0:
+        makeUsersListRequest()
+        break
+    case 1:
+        makeComicListRequest()
+        break
+    }
 }

@@ -3,109 +3,32 @@ import QtQuick.Layouts
 import QtQuick.Controls.Material
 import Constants 1.0
 //import QtWebEngine
-import AdminTableModel 1.0
+import ComicTableModel 1.0
 import "../components/layouts"
 import "../components/customs"
 import "../pages/forms"
 import "../../scripts/utilities.js" as Utils
+import "../../scripts/requests.js" as Req
 
 ScrollView{
     id: _comicScroll
     contentWidth: availableWidth
     contentHeight: _comicContentItem.implicitHeight
-    AddComicForm{ id: _addComicsForm }
+    readonly property alias _comicListModel: _listModel
+    readonly property alias _addComic: _addComicsForm
+    AddComicForm{ id: _addComicsForm; }
     UpdateComicForm{ id: _updateComicForm }
     PromptUserForm{ id: _promptUserForm }
-    Component{
-        id: _comicItemDelegateHighlighted
-        Rectangle{
-            id: _comicItem
-            width: _comicListView.width
-            height: 150
-            gradient: Gradient {
-                GradientStop { position: 0.0; color: Constants.colors.black }
-                GradientStop { position: 0.33; color: Constants.colors.sunset }
-                GradientStop { position: 1.0; color: Constants.colors.black }
-            }
-
-            MouseArea{
-                anchors.fill: parent
-                cursorShape: "PointingHandCursor"
-            }
-            HoverHandler{
-                id: _comicItemHoverHandler
-                enabled: true
-            }
-            ColumnLayout{
-                id: _col
-                anchors.top: parent.top
-                anchors.left: parent.left
-                anchors.right: parent.right
-                spacing: 10
-                Flow{
-                    id: _titleFlow
-                    Layout.fillWidth: true
-                    spacing: 2
-                    Label{
-                        text: "Titre:"
-                        font: Constants.blackFont.h5
-                        padding: 10
-                        Material.foreground: Constants.colors.white
-                    }
-                    Label{
-                        id: _comicTitleLabel
-                        text: "Kosambisamam ya Kimpa Vita"
-                        font: Constants.lightFont.h4
-                        padding: 10
-                        Material.foreground: Constants.colors.white
-                    }
-                }
-                Flow{
-                    id: _authorFlow
-                    Layout.fillWidth: true
-                    spacing: 2
-                    Label{
-                        text: "Author:"
-                        font: Constants.blackFont.h5
-                        padding: 10
-                        Material.foreground: Constants.colors.white
-                    }
-                    Label{
-                        id: _comicAuthorLabel
-                        text: "Malory Blackman"
-                        font: Constants.lightFont.h5
-                        padding: 10
-                        Material.foreground: Constants.colors.white
-                    }
-                }
-                Flow{
-                    id: _releasedFlow
-                    Layout.fillWidth: true
-                    spacing: 2
-                    Label{
-                        text: "Released:"
-                        font: Constants.blackFont.h5
-                        padding: 10
-                        Material.foreground: Constants.colors.white
-                    }
-                    Label{
-                        id: _comicReleasedLabel
-                        text: "2 Juillet 1706"
-                        font: Constants.lightFont.h5
-                        padding: 10
-                        Material.foreground: Constants.colors.white
-                    }
-                }
-            }
-        }
-    }
     Component{
         id: _comicItemDelegate
         Item{
             id: _comicItem
             width: _comicListView.width
             height: 150
-            opacity: _comicItemHoverHandler.hovered ? 0.8 : 1
+            opacity: _comicItemHoverHandler.hovered || _comicListView.currentIndex === index ? 0.8 : 1
+            readonly property string _title: model.name
+            readonly property string _authorId: model.authorId
+            readonly property string _dateReleased: model.dateReleased
             Image{
                 id: _img
                 anchors.fill: parent
@@ -139,7 +62,7 @@ ScrollView{
                     }
                     Label{
                         id: _comicTitleLabel
-                        text: "Kosambisamam ya Kimpa Vita"
+                        text: _title
                         font: Constants.lightFont.h4
                         padding: 10
                         Material.foreground: Constants.colors.white
@@ -157,7 +80,7 @@ ScrollView{
                     }
                     Label{
                         id: _comicAuthorLabel
-                        text: "Malory Blackman"
+                        text: ""
                         font: Constants.lightFont.h5
                         padding: 10
                         Material.foreground: Constants.colors.white
@@ -175,12 +98,15 @@ ScrollView{
                     }
                     Label{
                         id: _comicReleasedLabel
-                        text: "2 Juillet 1706"
+                        text: _dateReleased
                         font: Constants.lightFont.h5
                         padding: 10
                         Material.foreground: Constants.colors.white
                     }
                 }
+            }
+            Component.onCompleted: {
+                _agent.requestFindOneAuthor(model.authorId)
             }
         }
     }
@@ -224,7 +150,8 @@ ScrollView{
                                 Layout.fillWidth: _root.width < 640 ? true : false
                                 Layout.preferredWidth: 400
                                 Layout.preferredHeight: contentHeight
-                                currentIndex: -1
+                                Layout.leftMargin: 10
+                                Layout.rightMargin: 10
                                 spacing: 20
                                 header: Label{
                                     id: _resultsLabel
@@ -233,10 +160,13 @@ ScrollView{
                                     Material.foreground: Constants.colors.white
                                     horizontalAlignment: "AlignRight"
                                 }
-                                model: [1,2,3,4,5,6,7,8,9]
+                                model: ComicTableModel{
+                                    id: _listModel
+                                    comicListData: _comicListData
+                                }
+//                                highlight: _comicItemDelegateHighlighted
+//                                highlightFollowsCurrentItem: true
                                 delegate: _comicItemDelegate
-                                highlight: _comicItemDelegateHighlighted
-                                highlightFollowsCurrentItem: true
                             }
                             Loader{
                                 id: _pdfLoader

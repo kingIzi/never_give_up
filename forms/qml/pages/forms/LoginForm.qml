@@ -79,8 +79,6 @@ ColumnLayout{
             _emailTextField._textLabelError.text = ""
             const loginUser = Req.loginUser(_emailTextField._email,_passwordTextField._password)
             _agent.requestLogin(loginUser)
-            //_admin.requestLoginUser(loginUser)
-            //_appLoader.state ="navigate";
         }
     }
     Flow{

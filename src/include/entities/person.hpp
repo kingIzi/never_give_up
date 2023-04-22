@@ -21,7 +21,7 @@ class Person : public QObject
     Q_PROPERTY(QDateTime dateCreated READ dateCreated WRITE setDateCreated NOTIFY dateCreatedChanged)
     Q_PROPERTY(QDateTime dateUpdated READ dateUpdated WRITE setDateUpdated NOTIFY dateUpdatedChanged)
     Q_PROPERTY(QString status READ status WRITE setStatus NOTIFY statusChanged)
-private:
+public:
     static constexpr const char* defaultDateTimeString = "yyyy-MM-dd HH:mm:ss";
     static constexpr const char* dateTimeFormatLong = "dddd, dd MMMM yy hh:mm:ss";
     static constexpr const char* dateTimeFormatShort = "dd, MMM yyyy hh:mm:ss";

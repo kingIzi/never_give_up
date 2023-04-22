@@ -1,6 +1,8 @@
 #include "response.hpp"
 
 #include <QQmlEngine>
+#include <algorithm>
+#include <vector>
 
 const QJsonValue Response::parseLoginResponse(const QJsonDocument &response)
 {
@@ -26,31 +28,14 @@ const QJsonValue Response::parseLoginResponse(const QJsonDocument &response)
     return QJsonValue();
 }
 
-Response::Response(QNetworkReply* reply, QObject * parent) :
-    QObject{parent},
-    reply(reply)
+Response::Response(QObject * parent) :
+    QObject{parent}
 {
 
 }
 
 Response::~Response() {
 
-}
-
-void Response::connectNewReply(QNetworkReply * reply) {
-    QObject::connect(reply, &QNetworkReply::readyRead, this, [reply, this]() {
-        qDebug() << QJsonDocument::fromJson(reply->readAll());
-    });
-    QObject::connect(reply, &QNetworkReply::finished, this, [reply, this]() {
-        /*if (reply) {
-            emit Response::replyReadyRead(QJsonDocument::fromJson(reply->readAll()));
-            reply->deleteLater();
-        }*/
-    });
-}
-
-QNetworkReply* Response::getReply() const {
-    return this->reply;
 }
 
 const QJsonValue Response::parseResponse(const QJsonDocument& document) {
@@ -112,3 +97,47 @@ const res::Author Response::createAuthor(const QJsonObject &author) const noexce
 {
     return res::Author(author);
 }
+
+const QList<res::Author> Response::createAuthorList(const QJsonArray &res) const noexcept
+{
+    QList<res::Author> authors; authors.reserve(res.size());
+    std::for_each(std::begin(res),std::end(res),[this,&authors](const QJsonValue& value){
+        const auto author = this->createAuthor(value.toObject());
+        authors.emplaceBack(author);
+    });
+    return authors;
+}
+
+const QList<res::Comic*> Response::createComicList(const QJsonArray res) const noexcept
+{
+    using namespace res;
+    QList<Comic*> comics; comics.reserve(res.size());
+    std::for_each(std::begin(res),std::end(res),[this,&comics](const QJsonValue& value){
+        comics.emplaceBack(this->createComic(value.toObject()));
+    });
+    return comics;
+}
+
+const QList<res::Category> Response::createCategoriesList(const QJsonArray& res) const noexcept
+{
+    QList<res::Category> categories; categories.reserve(res.size());
+    for (const auto& i : res){
+        const auto category = this->createCategory(i.toObject());
+        categories.emplaceBack(category);
+    }
+    return categories;
+}
+
+const res::Category Response::createCategory(const QJsonObject &res) const noexcept
+{
+    return res::Category(res);
+}
+
+res::Comic* Response::createComic(const QJsonObject &object) const noexcept
+{
+    const auto comic = new res::Comic(object);
+    return comic;
+}
+
+
+

@@ -13,11 +13,20 @@ find_package(Qt6 6.2 COMPONENTS Quick Charts Network Core REQUIRED)
 qt_add_executable(appnever_give_up
 
     src/src/entities/person.cpp
+    src/src/entities/comic.cpp
+    src/src/entities/author.cpp
+    src/src/entities/category.cpp
+
     src/src/models/admintablemodel.cpp
     src/src/models/admintabledata.cpp
+    src/src/models/comiclistdata.cpp
+    src/src/models/categorieslistdata.cpp
+    src/src/models/comiclistmodel.cpp
+    src/src/models/categoriesmodel.cpp
+    src/src/models/authorlistmodel.cpp
+    src/src/models/authorlistdata.cpp
 
     src/src/request.cpp
-    src/src/admin.cpp
     src/src/response.cpp
     src/src/main.cpp
     src/src/agent.cpp
@@ -25,12 +34,20 @@ qt_add_executable(appnever_give_up
     src/include/agent.hpp
     src/include/request.hpp
     src/include/response.hpp
-    src/include/admin.hpp
 
     src/include/models/admintablemodel.hpp
     src/include/models/admintabledata.hpp
+    src/include/models/comiclistdata.hpp
+    src/include/models/categorieslistdata.hpp
+    src/include/models/comiclistmodel.hpp
+    src/include/models/categoriesmodel.hpp
+    src/include/models/authorlistmodel.hpp
+    src/include/models/authorlistdata.hpp
 
     src/include/entities/person.hpp
+    src/include/entities/comic.hpp
+    src/include/entities/author.hpp
+    src/include/entities/category.hpp
 
 )
 
@@ -65,6 +82,7 @@ set(BOOTSTRAP_ICONS
     forms/icons/bookshelf.svg
     forms/icons/funnel.svg
     forms/icons/calendar.svg
+    forms/icons/check-circle.svg
 )
 
 set(QML_IMAGES
@@ -131,6 +149,7 @@ set(QML_FILES
     forms/qml/components/customs/FormDatePicker.qml
     forms/qml/components/customs/FormFileSelector.qml
     forms/qml/components/customs/FormTextArea.qml
+    forms/qml/components/customs/DatePicker.qml
 
     forms/qml/components/layouts/NavBar.qml
     forms/qml/components/layouts/GeneralReview.qml

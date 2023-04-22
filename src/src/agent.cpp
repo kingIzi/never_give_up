@@ -4,6 +4,8 @@
 #include <QSettings>
 #include <QQmlApplicationEngine>
 #include <QQmlEngine>
+#include <QFileInfo>
+#include <QMimeDatabase>
 
 
 
@@ -15,6 +17,17 @@ Agent::Agent(QObject *parent)
       isLoggedIn_prop(false)
 {
 
+}
+
+const QString Agent::selectedFileName(const QString selectedFile) const
+{
+    return QFileInfo(selectedFile).fileName();
+}
+
+const QString Agent::getIdTokenFromSettings() const noexcept
+{
+    const QSettings settings("IziIndustries","BoyebiApp");
+    return settings.value("idToken").toString();
 }
 
 void Agent::onRequestLogin(const QJsonDocument res)
@@ -77,6 +90,103 @@ void Agent::onRequestUserUpdate(const QJsonDocument res)
     this->setIsRequesting(false);
 }
 
+void Agent::onRequestComicList(const QJsonDocument res)
+{
+    try{
+        const auto data = this->response.parseResponse(res);
+        if (!data.isNull()){
+            const auto comics = this->response.createComicList(data.toArray());
+            emit Agent::comicList(comics);
+        }
+    }
+    catch(const QException& e){
+        qDebug() << e.what();
+        emit Agent::requestErrorMsg(res::Error("Failed to request comic list",500));
+    }
+    catch(const std::exception& err){
+        qDebug() << err.what();
+        emit Agent::requestErrorMsg(res::Error("Failed to request comic list",500));
+    }
+}
+
+void Agent::onRequestFindOneAuthor(const QJsonDocument res)
+{
+    try{
+        const auto data = this->response.parseResponse(res);
+        if (!data.isNull()){
+            const auto author = this->response.createAuthor(data.toObject());
+            emit Agent::findOneAuthor(author);
+        }
+    }
+    catch(const QException& e){
+        qDebug() << e.what();
+        emit Agent::requestErrorMsg(res::Error("Failed to request find author",500));
+    }
+    catch(const std::exception& err){
+        qDebug() << err.what();
+        emit Agent::requestErrorMsg(res::Error("Failed to request find author",500));
+    }
+}
+
+void Agent::onRequestCategoriesList(const QJsonDocument res)
+{
+    try {
+        const auto data = this->response.parseLoginResponse(res);
+        if (!data.isNull()){
+            const auto categories = this->response.createResponseList(QList<res::Category>(),data.toArray());
+            emit Agent::categoryList(categories);
+        }
+    }
+    catch(const QException& e){
+        qDebug() << e.what();
+        emit Agent::requestErrorMsg(res::Error("Failed to request categories listr",500));
+    }
+    catch(const std::exception& err){
+        qDebug() << err.what();
+        emit Agent::requestErrorMsg(res::Error("Failed to request categories list",500));
+    }
+}
+
+void Agent::onRequestAuthorList(const QJsonDocument res)
+{
+    try {
+        const auto data = this->response.parseLoginResponse(res);
+        if (!data.isNull()){
+            const auto authors = this->response.createResponseList(QList<res::Author>(),data.toArray());
+            emit Agent::authorList(authors);
+        }
+    }
+    catch(const QException& e){
+        qDebug() << e.what();
+        emit Agent::requestErrorMsg(res::Error("Failed to request authors list",500));
+    }
+    catch(const std::exception& err){
+        qDebug() << err.what();
+        emit Agent::requestErrorMsg(res::Error("Failed to request authors list",500));
+    }
+}
+
+void Agent::onRequestCreateComic(const QJsonDocument res)
+{
+    try {
+        const auto data = this->response.parseLoginResponse(res);
+        if (!data.isNull()){
+            qDebug() << data.toObject();
+            const auto comic = this->response.createComic(data.toObject());
+            emit createdComic(comic);
+        }
+    }
+    catch(const QException& e){
+        qDebug() << e.what();
+        emit Agent::requestErrorMsg(res::Error("Failed to request authors list",500));
+    }
+    catch(const std::exception& err){
+        qDebug() << err.what();
+        emit Agent::requestErrorMsg(res::Error("Failed to request authors list",500));
+    }
+
+}
+
 void Agent::setIsRequesting(const bool arg)
 {
     if (this->isRequesting_prop != arg) {
@@ -111,11 +221,21 @@ void Agent::storeAgentAuth() const
 void Agent::requestLogin(const QVariantMap body)
 {
     try{
+        const auto doc = [body](){ return QJsonDocument::fromVariant(body); };
+        const auto login = [this](const QByteArray data){ this->onRequestLogin(QJsonDocument::fromJson(data)); };
         const auto url = this->request_ptr->buildUrl({},Request::Endpoint::sessionLogin);
-        QObject::connect(this->request_ptr.get(),&Request::replyReadyRead,this,&Agent::onRequestLogin);
+        QNetworkRequest req(url);
+        req.setHeader(QNetworkRequest::ContentTypeHeader,"application/json");
+        const auto man = new QNetworkAccessManager(this);
         this->setIsRequesting(true);
-        const auto reply = this->request_ptr->makeRequestNoIdtoken(url, QJsonDocument::fromVariant(body));
-        this->request_ptr->connectReplyReadyRead(reply);
+        const auto reply = man->post(req,doc().toJson());
+        QObject::connect(reply,&QNetworkReply::finished,this,[reply,man,login](){
+            if (reply){
+                login(reply->readAll());
+                reply->deleteLater();
+            }
+            man->deleteLater();
+        });
     }
     catch(const QException& e){
         qDebug() << e.what();
@@ -128,14 +248,24 @@ void Agent::requestLogin(const QVariantMap body)
 }
 
 void Agent::requestUsersList(const QVariantMap body){
-    const QSettings settings("IziIndustries","BoyebiApp");
-    const auto idToken = settings.value("idToken").toString();
     try{
+        const auto idToken = this->getIdTokenFromSettings();
+        const auto doc = [body]() { return QJsonDocument::fromVariant(body); };
+        const auto users = [this](const QByteArray data){ this->onRequestUsersList(QJsonDocument::fromJson(data)); };
         const auto url = this->request_ptr->buildUrl({},Request::Endpoint::userList);
-        QObject::connect(this->request_ptr.get(),&Request::replyReadyRead,this,&Agent::onRequestUsersList);
+        QNetworkRequest req(url);
+        req.setHeader(QNetworkRequest::ContentTypeHeader,"application/json");
+        req.setRawHeader(QByteArray("Authorization"), QString("Bearer %1").arg(idToken).toUtf8());
+        const auto man = new QNetworkAccessManager(this);
         this->setIsRequesting(true);
-        const auto reply = this->request_ptr->makeJsonPostRequest(url,idToken,QJsonDocument::fromVariant(body));
-        this->request_ptr->connectReplyReadyRead(reply);
+        const auto reply = man->post(req,doc().toJson());
+        QObject::connect(reply,&QNetworkReply::finished,this,[reply,man,users](){
+            if (reply){
+                users(reply->readAll());
+                reply->deleteLater();
+            }
+            man->deleteLater();
+        });
     }
     catch(const QException& e){
         qDebug() << e.what();
@@ -149,16 +279,54 @@ void Agent::requestUsersList(const QVariantMap body){
 
 void Agent::requestUserUpdate(const QString userId,const Person* person)
 {
-    const QSettings settings("IziIndustries","BoyebiApp");
-    const auto idToken = settings.value("idToken").toString();
     try{
-       const auto queries = (QList<std::pair<QString,QString>>) {std::make_pair("userId",userId)};
-       const auto url = this->request_ptr->buildUrl(queries,Request::Endpoint::userUpdateOne);
-       QObject::connect(this->request_ptr.get(),&Request::replyReadyRead,this,&Agent::onRequestUserUpdate);
-       const auto reply = this->request_ptr->makeMultiPutRequest(url,idToken,person->userModifiableValuesDocumentForm());
-       this->setIsRequesting(true);
-       Q_UNUSED(reply);
-       //this->request_ptr->connectReplyReadyRead(reply);
+        const auto contentDispositionValue = [](const QString& key){ return QString("form-data; name=\"" + key + "\""); };
+        const auto multiPart = new QHttpMultiPart(QHttpMultiPart::FormDataType);
+        const auto doc = person->userModifiableValuesDocumentForm();
+        const auto values = doc.isObject() ? doc.object() : QJsonObject();
+        if (!values.isEmpty() && multiPart){
+            const auto keys = values.keys();
+            std::for_each(keys.begin(),keys.end(),[this,values,multiPart,contentDispositionValue](const QString& key){
+                QHttpPart textPart;
+                textPart.setHeader(QNetworkRequest::ContentDispositionHeader,contentDispositionValue(key));
+                textPart.setBody(values.value(key).toVariant().toByteArray());
+                multiPart->append(textPart);
+            });
+        }
+        const auto files = values.value("files").isNull() ? QJsonObject() : values.value("files").toObject();
+        if (!files.empty() && multiPart){
+            const auto fileKeys = files.keys();
+            for (const auto& key : fileKeys){
+                const QFileInfo fileInfo(files.value(key).toString());
+                if (!fileInfo.isFile())
+                    throw std::invalid_argument("One of the files specified does not exist or has been deleted from location.");
+
+                QHttpPart filePart;
+                filePart.setHeader(QNetworkRequest::ContentTypeHeader, QMimeDatabase().mimeTypeForFile(fileInfo.absoluteFilePath()).name());
+                filePart.setHeader(QNetworkRequest::ContentDispositionHeader,contentDispositionValue(key));
+                auto * file = new QFile(fileInfo.absoluteFilePath());
+                if (!file->open(QIODevice::ReadOnly))
+                    throw std::invalid_argument("Failed to open file specified. Please verify path exists");
+                filePart.setBodyDevice(file);
+                file->setParent(multiPart);
+                multiPart->append(filePart);
+            }
+        }
+        const auto idToken = this->getIdTokenFromSettings();
+        const auto man = new QNetworkAccessManager(this);
+        const auto url = this->request_ptr->buildUrl({std::make_pair("userId",userId)},Request::Endpoint::userUpdateOne);
+        QNetworkRequest req(url);
+        req.setRawHeader(QByteArray("Authorization"), QString("Bearer %1").arg(idToken).toUtf8());
+        this->setIsRequesting(true);
+        const auto reply = man->put(req,multiPart);
+        const auto userUpdate = [this](const QByteArray data) { this->onRequestUserUpdate(QJsonDocument::fromJson(data)); };
+        QObject::connect(reply,&QNetworkReply::finished,this,[reply,man,userUpdate](){
+            if (reply){
+                userUpdate(reply->readAll());
+                reply->deleteLater();
+            }
+            man->deleteLater();
+        });
     }
     catch(const QException& e){
         qDebug() << e.what();
@@ -167,6 +335,201 @@ void Agent::requestUserUpdate(const QString userId,const Person* person)
     catch(const std::runtime_error& err){
         qDebug() << err.what();
         emit Agent::requestErrorMsg(res::Error("Failed to request user update",500));
+    }
+    catch(const std::invalid_argument& err){
+        qDebug() << err.what();
+        emit Agent::requestErrorMsg(res::Error("Failed to request user update",500));
+    }
+}
+
+void Agent::requestComicList(const QVariantMap body)
+{
+    try{
+        const auto url = this->request_ptr->buildUrl({},Request::Endpoint::listComic);
+        const auto idToken = this->getIdTokenFromSettings();
+        QNetworkRequest req(url);
+        req.setHeader(QNetworkRequest::ContentTypeHeader,"application/json");
+        req.setRawHeader(QByteArray("Authorization"), QString("Bearer %1").arg(idToken).toUtf8());
+        const auto man = new QNetworkAccessManager(this);
+        this->setIsRequesting(true);
+        const auto reply = man->get(req);
+        const auto comics = [this](const QByteArray data) { this->onRequestComicList(QJsonDocument::fromJson(data)); };
+        QObject::connect(reply,&QNetworkReply::finished,this,[reply,man,comics](){
+            if (reply){
+                comics(reply->readAll());
+                reply->deleteLater();
+            }
+            man->deleteLater();
+        });
+
+
+    }
+    catch(const QException& e){
+        qDebug() << e.what();
+        emit Agent::requestErrorMsg(res::Error("Failed to request user update",500));
+    }
+    catch(const std::runtime_error& err){
+        qDebug() << err.what();
+        emit Agent::requestErrorMsg(res::Error("Failed to request user update",500));
+    }
+}
+
+void Agent::requestFindOneAuthor(const QString authorId)
+{
+    try{
+        const auto url = this->request_ptr->buildUrl({std::make_pair("authorId",authorId)},Request::Endpoint::findAuthor);
+        const auto idToken = this->getIdTokenFromSettings();
+        QNetworkRequest req(url);
+        req.setHeader(QNetworkRequest::ContentTypeHeader,"application/json");
+        req.setRawHeader(QByteArray("Authorization"), QString("Bearer %1").arg(idToken).toUtf8());
+        const auto man = new QNetworkAccessManager(this);
+        this->setIsRequesting(true);
+        const auto reply = man->get(req);
+        const auto findAuthor = [this](const QByteArray data) { this->onRequestFindOneAuthor(QJsonDocument::fromJson(data)); };
+        QObject::connect(reply,&QNetworkReply::finished,this,[reply,man,findAuthor](){
+            if (reply){
+                findAuthor(reply->readAll());
+                reply->deleteLater();
+            }
+            man->deleteLater();
+        });
+
+    }
+    catch(const QException& e){
+        qDebug() << e.what();
+        emit Agent::requestErrorMsg(res::Error("Failed to request find Author",500));
+    }
+    catch(const std::runtime_error& err){
+        qDebug() << err.what();
+        emit Agent::requestErrorMsg(res::Error("Failed to request find Author",500));
+    }
+}
+
+void Agent::requestCategoriesList(const QVariantMap body)
+{
+    try{
+        const auto url = this->request_ptr->buildUrl({},Request::Endpoint::listCategory);
+        const auto idToken = this->getIdTokenFromSettings();
+        QNetworkRequest req(url);
+        req.setHeader(QNetworkRequest::ContentTypeHeader,"application/json");
+        req.setRawHeader(QByteArray("Authorization"), QString("Bearer %1").arg(idToken).toUtf8());
+        const auto man = new QNetworkAccessManager(this);
+        this->setIsRequesting(true);
+        const auto reply = man->get(req);
+        const auto categories = [this](const QByteArray data) { this->onRequestCategoriesList(QJsonDocument::fromJson(data)); };
+        QObject::connect(reply,&QNetworkReply::finished,this,[reply,man,categories](){
+            if (reply){
+                categories(reply->readAll());
+                reply->deleteLater();
+            }
+            man->deleteLater();
+        });
+    }
+    catch(const QException& e){
+        qDebug() << e.what();
+        emit Agent::requestErrorMsg(res::Error("Failed to request categories list",500));
+    }
+    catch(const std::runtime_error& err){
+        qDebug() << err.what();
+        emit Agent::requestErrorMsg(res::Error("Failed to request categories list",500));
+    }
+}
+
+void Agent::requestAuthorList()
+{
+    try{
+        const auto url = this->request_ptr->buildUrl({},Request::Endpoint::listAuthor);
+        const auto idToken = this->getIdTokenFromSettings();
+        QNetworkRequest req(url);
+        req.setHeader(QNetworkRequest::ContentTypeHeader,"application/json");
+        req.setRawHeader(QByteArray("Authorization"), QString("Bearer %1").arg(idToken).toUtf8());
+        const auto man = new QNetworkAccessManager(this);
+        this->setIsRequesting(true);
+        const auto reply = man->get(req);
+        const auto listAuthor = [this](const QByteArray data) { this->onRequestAuthorList(QJsonDocument::fromJson(data)); };
+        QObject::connect(reply,&QNetworkReply::finished,this,[reply,man,listAuthor](){
+            if (reply){
+                listAuthor(reply->readAll());
+                reply->deleteLater();
+            }
+            man->deleteLater();
+        });
+
+    }
+    catch(const QException& e){
+        qDebug() << e.what();
+        emit Agent::requestErrorMsg(res::Error("Failed to request categories list",500));
+    }
+    catch(const std::runtime_error& err){
+        qDebug() << err.what();
+        emit Agent::requestErrorMsg(res::Error("Failed to request categories list",500));
+    }
+}
+
+void Agent::requestCreateComic(const QVariantMap body)
+{
+    try{
+        qDebug() << QJsonDocument::fromVariant(body);
+        return;
+        const auto contentDispositionValue = [](const QString& key){ return QString("form-data; name=\"" + key + "\""); };
+        const auto multiPart = new QHttpMultiPart(QHttpMultiPart::FormDataType);
+        const auto doc = QJsonDocument::fromVariant(body);
+        const auto values = doc.isObject() ? doc.object() : QJsonObject();
+        if (!values.isEmpty() && multiPart){
+            const auto keys = values.keys();
+            std::for_each(keys.begin(),keys.end(),[this,values,multiPart,contentDispositionValue](const QString& key){
+                QHttpPart textPart;
+                textPart.setHeader(QNetworkRequest::ContentDispositionHeader,contentDispositionValue(key));
+                textPart.setBody(values.value(key).toVariant().toByteArray());
+                multiPart->append(textPart);
+            });
+        }
+        const auto files = values.value("files").isNull() ? QJsonObject() : values.value("files").toObject();
+        if (!files.empty() && multiPart){
+            const auto fileKeys = files.keys();
+            for (const auto& key : fileKeys){
+                const QFileInfo fileInfo(files.value(key).toString());
+                if (!fileInfo.isFile())
+                    throw std::invalid_argument("One of the files specified does not exist or has been deleted from location.");
+
+                QHttpPart filePart;
+                filePart.setHeader(QNetworkRequest::ContentTypeHeader, QMimeDatabase().mimeTypeForFile(fileInfo.absoluteFilePath()).name());
+                filePart.setHeader(QNetworkRequest::ContentDispositionHeader,contentDispositionValue(key));
+                auto * file = new QFile(fileInfo.absoluteFilePath());
+                if (!file->open(QIODevice::ReadOnly))
+                    throw std::invalid_argument("Failed to open file specified. Please verify path exists");
+                filePart.setBodyDevice(file);
+                file->setParent(multiPart);
+                multiPart->append(filePart);
+            }
+        }
+        const auto idToken = this->getIdTokenFromSettings();
+        const auto man = new QNetworkAccessManager(this);
+        const auto url = this->request_ptr->buildUrl({},Request::Endpoint::createComic);
+        QNetworkRequest req(url);
+        req.setRawHeader(QByteArray("Authorization"), QString("Bearer %1").arg(idToken).toUtf8());
+        this->setIsRequesting(true);
+        const auto reply = man->post(req,multiPart);
+        const auto userUpdate = [this](const QByteArray data) { this->onRequestCreateComic(QJsonDocument::fromJson(data)); };
+        QObject::connect(reply,&QNetworkReply::finished,this,[reply,man,userUpdate](){
+            if (reply){
+                userUpdate(reply->readAll());
+                reply->deleteLater();
+            }
+            man->deleteLater();
+        });
+    }
+    catch(const QException& e){
+        qDebug() << e.what();
+        emit Agent::requestErrorMsg(res::Error("Failed to request categories list",500));
+    }
+    catch(const std::runtime_error& err){
+        qDebug() << err.what();
+        emit Agent::requestErrorMsg(res::Error("Failed to request categories list",500));
+    }
+    catch(const std::invalid_argument& err){
+        qDebug() << err.what();
+        emit Agent::requestErrorMsg(res::Error("Failed to request categories list",500));
     }
 }
 

@@ -10,6 +10,7 @@ Item{
     readonly property alias _combobox: _formComboBox
     readonly property alias _textFieldError: _textFieldFormError
     property var _model: []
+    signal valueChanged(string value)
     ColumnLayout{
         id: _col4L
         anchors.fill: parent
@@ -25,6 +26,9 @@ Item{
             id: _formComboBox
             Layout.fillWidth: true
             model: _formField._model
+            onCurrentValueChanged: {
+                valueChanged(currentValue)
+            }
             leftPadding: 30
             background: Rectangle{
                 color: Constants.colors.gray500
@@ -59,15 +63,6 @@ Item{
             }
             delegate: ItemDelegate {
                 width: _formComboBox.width
-        //        contentItem: Label {
-        //            text: _formComboBox.textRole
-        //                  ? (Array.isArray(_formComboBox.model) ? modelData[_formComboBox.textRole] : model[_formComboBox.textRole])
-        //                  : modelData
-        //            color: Constants.colors.white
-        //            font: _categoriesComboBox.font
-        //            elide: Text.ElideRight
-        //            verticalAlignment: Text.AlignVCenter
-        //        }
                 text: modelData
                 Material.foreground: Constants.colors.white
                 highlighted: _formComboBox.highlightedIndex === index

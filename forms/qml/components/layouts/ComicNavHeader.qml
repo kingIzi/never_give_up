@@ -4,6 +4,57 @@ import QtQuick.Controls.Material
 import Constants 1.0
 import "../customs"
 import "../../../scripts/utilities.js" as Utils
+import "../../../scripts/requests.js" as Req
+
+
+
+//Pane{
+//    id: _comicPaneHeader
+//    implicitHeight: _col6L.implicitHeight
+//    Material.background: Constants.colors.black
+//    padding: 10
+//    signal openAddComicForm()
+//    signal openUpdateComicForm()
+//    signal openDeleteComicForm()
+//    ColumnLayout{
+//        id: _col6L
+//        anchors.fill: parent
+//        Label{
+//            id: _tableTitleLabel
+//            text: "In Stock"
+//            font: Constants.blackFont.h2
+//            Material.foreground: Constants.colors.white
+//            Layout.alignment: Qt.AlignVCenter
+//            Layout.fillWidth: true
+//        }
+//        ToolBar {
+//            Layout.fillWidth: true
+//            Layout.preferredHeight: _row18L.implicitHeight
+//            RowLayout {
+//                id: _row18L
+//                anchors.fill: parent
+//                ToolButton {
+//                    text: qsTr("‹")
+//                    onClicked: stack.pop()
+//                }
+//                Label {
+//                    text: "Title"
+//                    elide: Label.ElideRight
+//                    horizontalAlignment: Qt.AlignHCenter
+//                    verticalAlignment: Qt.AlignVCenter
+//                    Layout.fillWidth: true
+//                }
+//                ToolButton {
+//                    text: qsTr("⋮")
+//                    onClicked: menu.open()
+//                }
+//            }
+//        }
+//    }
+//}
+
+
+
 
 Pane{
     id: _comicPaneHeader
@@ -46,16 +97,19 @@ Pane{
                         ToolButton {
                             icon.source: Constants.icons.plus
                             icon.color: Constants.colors.success
-                            enabled: _comicListView.currentIndex >= 0
                             HoverHandler{
                                 enabled: true
                                 cursorShape: "PointingHandCursor"
                             }
-                            onClicked: openAddComicForm()
+                            onClicked: {
+                                openAddComicForm()
+                                _agent.requestCategoriesList(Req.availableCategories())
+                                _agent.requestAuthorList()
+                            }
                         }
                         ToolButton {
                             icon.source: Constants.icons.pen
-                            icon.color: Constants.colors.sunset
+                            icon.color: enabled ? Constants.colors.sunset : Constants.colors.gray
                             enabled: _comicListView.currentIndex >= 0
                             HoverHandler{
                                 enabled: true
@@ -65,7 +119,7 @@ Pane{
                         }
                         ToolButton {
                             icon.source: Constants.icons.dash
-                            icon.color: Constants.colors.danger
+                            icon.color: enabled ? Constants.colors.danger : Constants.colors.gray
                             enabled: _comicListView.currentIndex >= 0
                             HoverHandler{
                                 enabled: true

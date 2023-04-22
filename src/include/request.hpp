@@ -32,11 +32,12 @@ private:
 	bool isOperating;
 	static const char* URL_FORMAT_REGEX;
 private:
-	const QList<QHttpPart> buildRequestHttpParts(const QJsonDocument& document, QHttpMultiPart* multiPart) const;
-    void appendHttpFilePart(const QJsonObject& files,QHttpMultiPart * const multiPart) const;
     const QString contentDispositionValue(const QString key) const;
-    void appendHttpParts(const QJsonDocument& document,QHttpMultiPart *const multiPart) const;
+    void connectReplyReadyRead(QNetworkReply * reply);
+    void connectReplyReadyRead(QNetworkReply * const reply,QHttpMultiPart * const multiPart);
 public:
+    void appendHttpFilePart(const QJsonObject& files,QHttpMultiPart * const multiPart) const;
+    void appendHttpParts(const QJsonDocument& document,QHttpMultiPart *const multiPart) const;
 	struct Endpoint {
 		//session
 		static constexpr const char* sessionLogin = "/session/login";
@@ -89,19 +90,17 @@ public:
 	const QString getBaseUrl() const;
 	void setIsOperating(const bool isOperating);
 	const bool getIsOperating() const;
-    void connectReplyReadyRead(QNetworkReply * reply);
 
 	//make request
 
-	QNetworkReply* makeJsonPostRequest(const QUrl& url, const QString& idToken,
+    void makeJsonPostRequest(const QUrl& url, const QString& idToken,
 	                                        const QJsonDocument& document);
-    QNetworkReply* makeRequestNoIdtoken(const QUrl& url,const QJsonDocument& document);
+    void makeRequestNoIdtoken(const QUrl& url,const QJsonDocument& document);
 
-    QNetworkReply* makeMultiPutRequest(const QUrl& url, const QString& idToken,const QJsonDocument& document);
-    QNetworkReply const* makeMultiPostRequest(const QUrl& url, const QString& idToken,const QJsonDocument& document);
+    void makeMultiPutRequest(const QUrl& url, const QString& idToken,const QJsonDocument& document);
+    void makeMultiPostRequest(const QUrl& url, const QString& idToken,const QJsonDocument& document);
 
-	QNetworkReply* makeGetRequest(const QUrl& url, const QString& idToken);
-	QNetworkReply* makeDeleteRequest(const QUrl& url, const QString& idToken);
+    void makeGetRequest(const QUrl& url, const QString& idToken);
 
 	//helper
 	const QUrl buildUrl(const QList<QPair<QString, QString>>& queries, const QString& path) const;

@@ -130,5 +130,6 @@ QtObject {
         readonly property url bookshelf: "qrc:/never_give_up/forms/icons/bookshelf.svg"
         readonly property url funnel: "qrc:/never_give_up/forms/icons/funnel.svg"
         readonly property url calendar: "qrc:/never_give_up/forms/icons/calendar.svg"
+        readonly property url checkCircle: "qrc:/never_give_up/forms/icons/check-circle.svg"
     }
 }

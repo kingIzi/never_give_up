@@ -13,20 +13,20 @@ Item{
     implicitHeight: _col5L.implicitHeight
     readonly property alias _titleLabel: _tableTitleLabel
     readonly property alias _tableViewModel: _tableModel
-    Component.onCompleted: {
-        const users = Req.availableUsersList()
-        _agent.requestUsersList(users)
-    }
-    Connections{
-        target: _agent
-        function onUsersList(users){
-            _tableModel.populate(users)
-        }
-        function onUpdatedUser(updatedUser){
-            console.log(updatedUser)
-            _tableModel.onUpdatedItem(updatedUser)
-        }
-    }
+//    Component.onCompleted: {
+//        const users = Req.availableUsersList()
+//        _agent.requestUsersList(users)
+//    }
+//    Connections{
+//        target: _agent
+//        function onUsersList(users){
+//            _tableModel.populate(users)
+//        }
+//        function onUpdatedUser(updatedUser){
+//            console.log(updatedUser)
+//            _tableModel.onUpdatedItem(updatedUser)
+//        }
+//    }
     Component{
         id: _tableDel
         Loader{
