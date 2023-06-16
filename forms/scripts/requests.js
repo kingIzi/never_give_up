@@ -27,9 +27,11 @@ function createAddComicForm(form){
         "name": form.name,
         "categories": form.categories,
         "authorId": form.authorId,
-        "dateReleased": form.dateReleased,
-        "thumbnailFile": form.thumbnailFile,
-        "data": form.comicFile,
+        "dateReleased": new Date(form.dateReleased),
+        "files": {
+            "thumbnail": form.thumbnailFile,
+            "data": form.comicFile,
+        },
         "description": form.description
     };
     return comic

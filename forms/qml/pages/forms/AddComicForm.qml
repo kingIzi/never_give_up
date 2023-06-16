@@ -253,14 +253,14 @@ Popup {
                     _title: "Le thumbnail"
                     Layout.fillWidth: true
                     _textField.text: "la photo profil"
-                    nameFilters: ["*.jpg","*.png","*.jpeg"]
+                    nameFilters: [ "Image files (*.jpg *.png)", "All files (*)" ]
                 }
                 FormFileSelector{
                     id: _comicFile
                     _title: "Le BD"
                     Layout.fillWidth: true
                     _textField.text: "Le BD"
-                    nameFilters: ["*pdf"]
+                    nameFilters: [ "Pdf files (*.pdf)", "All files (*)" ]
                 }
                 FormTextArea{
                     id: _description

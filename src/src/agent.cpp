@@ -6,6 +6,7 @@
 #include <QQmlEngine>
 #include <QFileInfo>
 #include <QMimeDatabase>
+#include <QJsonArray>
 
 
 
@@ -469,40 +470,44 @@ void Agent::requestAuthorList()
 void Agent::requestCreateComic(const QVariantMap body)
 {
     try{
-        qDebug() << QJsonDocument::fromVariant(body);
-        return;
-        const auto contentDispositionValue = [](const QString& key){ return QString("form-data; name=\"" + key + "\""); };
-        const auto multiPart = new QHttpMultiPart(QHttpMultiPart::FormDataType);
-        const auto doc = QJsonDocument::fromVariant(body);
-        const auto values = doc.isObject() ? doc.object() : QJsonObject();
-        if (!values.isEmpty() && multiPart){
-            const auto keys = values.keys();
-            std::for_each(keys.begin(),keys.end(),[this,values,multiPart,contentDispositionValue](const QString& key){
-                QHttpPart textPart;
-                textPart.setHeader(QNetworkRequest::ContentDispositionHeader,contentDispositionValue(key));
-                textPart.setBody(values.value(key).toVariant().toByteArray());
-                multiPart->append(textPart);
-            });
-        }
-        const auto files = values.value("files").isNull() ? QJsonObject() : values.value("files").toObject();
-        if (!files.empty() && multiPart){
-            const auto fileKeys = files.keys();
-            for (const auto& key : fileKeys){
-                const QFileInfo fileInfo(files.value(key).toString());
-                if (!fileInfo.isFile())
-                    throw std::invalid_argument("One of the files specified does not exist or has been deleted from location.");
-
+        auto *multiPart = new QHttpMultiPart(QHttpMultiPart::FormDataType);
+        if (body.keys().contains("files")){
+            const auto files = body.value("files").toMap();
+            const auto filesKeys = files.keys();
+            for (const auto& key : filesKeys){
+                const auto path = files.value(key).toString().startsWith("file:///") ? files.value(key).toString().remove(0,8) : files.value(key).toString();
+                QFileInfo info(path);
+                if (!info.isFile())
+                    throw std::invalid_argument(QString(key + " path given is not a file.").toStdString().c_str());
                 QHttpPart filePart;
-                filePart.setHeader(QNetworkRequest::ContentTypeHeader, QMimeDatabase().mimeTypeForFile(fileInfo.absoluteFilePath()).name());
-                filePart.setHeader(QNetworkRequest::ContentDispositionHeader,contentDispositionValue(key));
-                auto * file = new QFile(fileInfo.absoluteFilePath());
+                const auto contentDispositionHeader = QVariant("form-data; name=\"" + key + "\"; filename=\"" + info.fileName() + "\"");
+                filePart.setHeader(QNetworkRequest::ContentTypeHeader, QMimeDatabase().mimeTypeForFile(info.absoluteFilePath()).name());
+                filePart.setHeader(QNetworkRequest::ContentDispositionHeader, contentDispositionHeader);/* version.tkt is the name on my Disk of the file that I want to upload */
+                auto file = new QFile(info.absoluteFilePath());
                 if (!file->open(QIODevice::ReadOnly))
-                    throw std::invalid_argument("Failed to open file specified. Please verify path exists");
+                    throw std::invalid_argument(("Failed to open file " + key).toStdString().c_str());
                 filePart.setBodyDevice(file);
                 file->setParent(multiPart);
                 multiPart->append(filePart);
             }
         }
+        const auto contentDispositionValue = [](const QString& key){ return QVariant("form-data; name=\"" + key + "\""); };
+        const auto keys = body.keys();
+        for (const auto& key : keys){
+            if (key.compare("files") != 0){
+                QHttpPart textPart;
+                textPart.setHeader(QNetworkRequest::ContentDispositionHeader,contentDispositionValue(key));
+                const auto part = body.value(key);
+                if (key.compare("dateReleased") == 0)
+                    textPart.setBody(part.toDate().toString("yyyy-MM-dd").toUtf8());
+                else if (part.userType() == QMetaType::QString)
+                    textPart.setBody(part.toString().toUtf8());
+                else if (part.userType() == QMetaType::QStringList) //NOT WORKING PLEASE FIX
+                    textPart.setBody(QJsonDocument(QJsonArray::fromStringList(part.toStringList())).toJson());
+                multiPart->append(textPart);
+            }
+        }
+
         const auto idToken = this->getIdTokenFromSettings();
         const auto man = new QNetworkAccessManager(this);
         const auto url = this->request_ptr->buildUrl({},Request::Endpoint::createComic);
@@ -510,14 +515,106 @@ void Agent::requestCreateComic(const QVariantMap body)
         req.setRawHeader(QByteArray("Authorization"), QString("Bearer %1").arg(idToken).toUtf8());
         this->setIsRequesting(true);
         const auto reply = man->post(req,multiPart);
-        const auto userUpdate = [this](const QByteArray data) { this->onRequestCreateComic(QJsonDocument::fromJson(data)); };
-        QObject::connect(reply,&QNetworkReply::finished,this,[reply,man,userUpdate](){
+        multiPart->setParent(reply);
+        QObject::connect(reply,&QNetworkReply::finished,this,[reply,man,multiPart](){
             if (reply){
-                userUpdate(reply->readAll());
+                qDebug() << reply->readAll();
                 reply->deleteLater();
             }
+            multiPart->deleteLater();
             man->deleteLater();
         });
+
+
+//        QHttpMultiPart *multiPart = new QHttpMultiPart(QHttpMultiPart::FormDataType);
+//        QHttpPart imagePart;
+//        //imagePart.setHeader(QNetworkRequest::ContentTypeHeader, QVariant("text/plain"));
+//        imagePart.setHeader(QNetworkRequest::ContentDispositionHeader, QVariant("form-data; name=\"thumbnail\"; filename=\"religion.png\""));/* version.tkt is the name on my Disk of the file that I want to upload */
+
+//        QString apkLocation = "C:/Users/scott/Downloads/religion.png";
+//        QFile *file = new QFile(apkLocation);
+//        file->open(QIODevice::ReadOnly);
+//        imagePart.setBodyDevice(file);
+//        file->setParent(multiPart); // we cannot delete the file now, so delete it with the multiPart
+
+//        multiPart->append(imagePart);
+
+
+//        QNetworkAccessManager *networkManager= new QNetworkAccessManager;
+//        const auto idToken = this->getIdTokenFromSettings();
+//        const auto man = new QNetworkAccessManager(this);
+//        const auto url = this->request_ptr->buildUrl({},Request::Endpoint::comicTest);
+//        QNetworkRequest request(url);
+//        QNetworkRequest req(url);
+//        req.setRawHeader(QByteArray("Authorization"), QString("Bearer %1").arg(idToken).toUtf8());
+//        this->setIsRequesting(true);
+//        qDebug() << multiPart->children();
+//        const auto reply = man->post(req,multiPart);
+//        multiPart->setParent(reply);
+//        QObject::connect(reply,&QNetworkReply::finished,this,[reply,man,multiPart](){
+//            if (reply){
+//                qDebug() << reply->readAll();
+//                reply->deleteLater();
+//            }
+//            multiPart->deleteLater();
+//            man->deleteLater();
+//        });
+
+
+
+//        const auto contentDispositionValue = [](const QString& key){ return QString("form-data; name=\"" + key + "\""); };
+//        const auto multiPart = new QHttpMultiPart(QHttpMultiPart::FormDataType);
+//        const auto doc = QJsonDocument::fromVariant(body);
+//        const auto values = doc.isObject() ? doc.object() : QJsonObject();
+//        const auto keys = values.keys();
+//        for (const auto& key : keys){
+//            if (key.compare("files") != 0){
+//                QHttpPart textPart;
+//                textPart.setHeader(QNetworkRequest::ContentDispositionHeader,contentDispositionValue(key));
+//                textPart.setBody(values.value(key).toVariant().toByteArray());
+//                multiPart->append(textPart);
+//            }
+//        }
+//        const auto files = values.value("files").isNull() ? QJsonObject() : values.value("files").toObject();
+//        const auto fileKeys = files.keys();
+//        for (const auto& key : fileKeys){
+//            auto path = files.value(key).toString();
+//            if(path.startsWith("file:///")) path = path.remove(0,8);
+//            const QFileInfo fileInfo(path);
+//            if (!fileInfo.isFile())
+//                throw std::invalid_argument("One of the files specified does not exist or has been deleted from location.");
+
+//            QHttpPart filePart;
+//            filePart.setHeader(QNetworkRequest::ContentTypeHeader, QMimeDatabase().mimeTypeForFile(fileInfo.absoluteFilePath()).name());
+//            filePart.setHeader(QNetworkRequest::ContentDispositionHeader,contentDispositionValue(key));
+//            auto * const file = new QFile(fileInfo.absoluteFilePath());
+//            if (file->open(QIODevice::ReadOnly)){
+//                filePart.setBodyDevice(file);
+//                file->setParent(multiPart);
+//                multiPart->append(filePart);
+//            }
+//        }
+//        const auto idToken = this->getIdTokenFromSettings();
+//        const auto man = new QNetworkAccessManager(this);
+//        const auto url = this->request_ptr->buildUrl({},Request::Endpoint::createComic);
+//        QNetworkRequest req(url);
+//        req.setRawHeader(QByteArray("Authorization"), QString("Bearer %1").arg(idToken).toUtf8());
+//        this->setIsRequesting(true);
+//        qDebug() << multiPart->children();
+//        const auto reply = man->post(req,multiPart);
+//        multiPart->setParent(reply);
+//        const auto createComic = [this](const QByteArray data) { qDebug() << data; this->onRequestCreateComic(QJsonDocument::fromJson(data)); };
+//        QObject::connect(reply,&QNetworkReply::uploadProgress,[reply](qint64 received,qint64 total){
+//            qDebug() << "Received:" << received << "Total: " << total;
+//        });
+//        QObject::connect(reply,&QNetworkReply::finished,this,[reply,man,createComic,multiPart](){
+//            if (reply){
+//                createComic(reply->readAll());
+//                reply->deleteLater();
+//            }
+//            multiPart->deleteLater();
+//            man->deleteLater();
+//        });
     }
     catch(const QException& e){
         qDebug() << e.what();

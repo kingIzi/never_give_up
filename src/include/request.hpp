@@ -65,7 +65,7 @@ public:
 		static constexpr const char* listCategory = "/category/list";
 
 		//comic
-		static constexpr const char* createComic = "/comic/createOne";
+        static constexpr const char* createComic = "/comic/createOne";
 		static constexpr const char* updateComic = "/comic/updateOne";
 		static constexpr const char* listComic = "/comic/list";
 		static constexpr const char* deleteComic = "/comic/delete";
@@ -77,6 +77,7 @@ public:
 		static constexpr const char* addComicComment = "/comic/comment/add";
 		static constexpr const char* likeComicComment = "/comic/comment/like";
 		static constexpr const char* removeComicComment = "/comic/comment/remove";
+        static constexpr const char* comicTest = "/comic/test";
 	};
 public:
 	//constructor destructor

@@ -17,8 +17,8 @@ Item{
         id: fileDialog
         currentFolder: StandardPaths.standardLocations(StandardPaths.PicturesLocation)[0]
         onAccepted: {
+            _formDatePicker.filePath = fileDialog.currentFile
             _formDatePicker._title = _agent.selectedFileName(selectedFile.toString())
-            _formDatePicker.filePath = selectedFile
         }
 
         nameFilters: _formDatePicker.nameFilters
